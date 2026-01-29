@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -32,11 +31,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _animationController.forward();
-
-    // Navigate to home screen after 3 seconds
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/home');
-    });
   }
 
   @override
@@ -48,108 +42,56 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Color(0xFFB8E6F5), // Light blue background
-        child: Stack(
-          children: [
-            // Decorative circles at the bottom
-            Positioned(
-              bottom: -100,
-              left: -50,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Image.asset(
-                  'assets/images/Circle.png',
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -120,
-              left: 80,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Opacity(
-                  opacity: 0.7,
+      body: GestureDetector(
+        onTap: () {
+          Navigator.of(context).pushReplacementNamed('/login');
+        },
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Color(0xFFB8E6F5), // Light blue background
+          child: Stack(
+            children: [
+              // Decorative circle at the bottom
+              Positioned(
+                bottom: -150,
+                left: -80,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
                   child: Image.asset(
                     'assets/images/Circle.png',
-                    width: 320,
-                    height: 320,
+                    width: 500,
+                    height: 500,
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-            Positioned(
-              bottom: -80,
-              right: -30,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Opacity(
-                  opacity: 0.8,
-                  child: Image.asset(
-                    'assets/images/Circle.png',
-                    width: 280,
-                    height: 280,
-                    fit: BoxFit.contain,
-                  ),
+              // Main content
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Adjustable spacing above logo
+                    SizedBox(height: 50),
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Image.asset(
+                          'assets/images/logo_wanderly.png',
+                          width: 180,
+                          height: 180,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 100,
+                    ), // Atur nilai ini untuk spacing bawah logo
+                  ],
                 ),
               ),
-            ),
-            // Main content
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Animated Logo
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Image.asset(
-                        'assets/images/logo_wanderly.png',
-                        width: 180,
-                        height: 180,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-
-                  // App Name
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Text(
-                      'Wanderly',
-                      style: TextStyle(
-                        fontSize: 42,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E88E5),
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-
-                  // Subtitle
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Text(
-                      'by Harisenin.com',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
