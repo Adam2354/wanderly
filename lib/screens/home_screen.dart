@@ -164,53 +164,111 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {},
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          'assets/images/kyoto.png',
-                          width: 90,
-                          height: 60,
-                          fit: BoxFit.cover,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/detail');
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
+                          spreadRadius: 2,
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Kyoto Exploration',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: LinearProgressIndicator(
-                                value: 0.0,
-                                minHeight: 6,
-                                backgroundColor: const Color(0xFFEDEDED),
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF2F4BB9),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        // Image with KYOTO overlay
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 110,
+                            height: 85,
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.asset(
+                                    'assets/images/kyoto.png',
+                                    width: 110,
+                                    height: 85,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.transparent,
+                                      ],
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text('0%'),
-                    ],
+                        // Text and Progress
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 16,
+                              top: 16,
+                              bottom: 16,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: const [
+                                    Text(
+                                      'Kyoto Exploration',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        fontFamily: 'Urbanist',
+                                      ),
+                                    ),
+                                    Text(
+                                      '0%',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'Urbanist',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: LinearProgressIndicator(
+                                    value: 0.0,
+                                    minHeight: 5,
+                                    backgroundColor: const Color(0xFFE8E8E8),
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          Color(0xFF2196F3),
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -245,14 +303,22 @@ class HomeScreen extends StatelessWidget {
                         width: 200,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ClipRRect(
                               borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
+                                top: Radius.circular(16),
                               ),
                               child: Image.asset(
                                 cities[index]['image'] as String,
@@ -262,18 +328,29 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(12.0),
                               child: Text(
                                 cities[index]['name'] as String,
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Urbanist',
+                                ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0,
+                                horizontal: 12.0,
                               ),
-                              child: Text('${cities[index]['rating']} ⭐'),
+                              child: Text(
+                                '${cities[index]['rating']} ⭐',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'Urbanist',
+                                ),
+                              ),
                             ),
+                            const SizedBox(height: 8),
                           ],
                         ),
                       );
@@ -314,27 +391,29 @@ class HomeScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
+                                  color: Colors.black.withOpacity(0.12),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                  spreadRadius: 1,
                                 ),
                               ],
                             ),
                             child: ClipOval(
                               child: Image.asset(
                                 popular[index]['image'] as String,
-                                width: 60,
-                                height: 60,
+                                width: 65,
+                                height: 65,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 10),
                           Text(
                             popular[index]['name'] as String,
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.w500,
+                              fontFamily: 'Urbanist',
                             ),
                           ),
                         ],
@@ -347,7 +426,11 @@ class HomeScreen extends StatelessWidget {
                 // Rancang Perjalanan Khusus
                 const Text(
                   'Rancang Perjalanan Khusus',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Urbanist',
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Column(
@@ -375,24 +458,32 @@ class HomeScreen extends StatelessWidget {
                       },
                     ];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
                               destinations[index]['image'] as String,
-                              width: 54,
-                              height: 54,
+                              width: 60,
+                              height: 60,
                               fit: BoxFit.cover,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,20 +492,27 @@ class HomeScreen extends StatelessWidget {
                                   destinations[index]['title'] as String,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    fontFamily: 'Urbanist',
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 6),
                                 Text(
                                   destinations[index]['location'] as String,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.black54,
+                                    fontFamily: 'Urbanist',
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios, size: 16),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.black54,
+                          ),
                         ],
                       ),
                     );
@@ -424,17 +522,34 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF2F4BB9),
-        unselectedItemColor: Colors.black45,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.send), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: const Color(0xFF2F4BB9),
+          unselectedItemColor: Colors.black45,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
+            BottomNavigationBarItem(icon: Icon(Icons.send), label: ''),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              label: '',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -464,7 +579,7 @@ class _SectionHeader extends StatelessWidget {
           onTap: onTap,
           child: Text(
             actionText,
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            style: const TextStyle(fontSize: 12, color: Colors.black87),
           ),
         ),
       ],
