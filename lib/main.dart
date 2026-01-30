@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/splash/splash_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/register_screen.dart';
+import 'screens/home/home_screen.dart';
+import 'screens/trips/detail_screen.dart';
+import 'screens/itinerary/itinerary_screen.dart';
+import 'screens/itinerary/my_itinerary_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +29,9 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
+        '/detail': (context) => const DetailScreen(),
+        '/itinerary': (context) => const ItineraryScreen(),
+        '/activities': (context) => const MyItineraryScreen(),
       },
     );
   }
