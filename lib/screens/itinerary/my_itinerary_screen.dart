@@ -18,7 +18,7 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = store.categories.first;
+    selectedCategory = 'Semua';
     if (widget.initialCategory != null &&
         store.categories.contains(widget.initialCategory)) {
       selectedCategory = widget.initialCategory!;
@@ -31,6 +31,7 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
       text: existing?.location ?? '',
     );
     final notesController = TextEditingController(text: existing?.notes ?? '');
+    DateTime? selectedDate = existing?.date;
 
     showDialog(
       context: context,
@@ -75,6 +76,41 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                 ),
                 maxLines: 2,
               ),
+              const SizedBox(height: 12),
+              StatefulBuilder(
+                builder: (context, setDialogState) => InkWell(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2030),
+                    );
+                    if (picked != null) {
+                      setDialogState(() {
+                        selectedDate = picked;
+                      });
+                    }
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Tanggal kunjungan (opsional)',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
+                    child: Text(
+                      selectedDate != null
+                          ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                          : 'Pilih tanggal',
+                      style: TextStyle(
+                        color: selectedDate != null
+                            ? Colors.black
+                            : Colors.black54,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -94,13 +130,18 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
 
                       setState(() {
                         if (existing != null && index != null) {
+                          final itemCategory = selectedCategory == 'Semua'
+                              ? store.getCategoryForItem(existing)
+                              : selectedCategory;
                           store.updateItem(
-                            selectedCategory,
-                            index,
+                            itemCategory,
+                            store.getIndexInCategory(itemCategory, existing),
                             ActivityItem(
                               name: name,
                               location: location,
                               notes: notes,
+                              date: selectedDate,
+                              imagePath: existing.imagePath,
                             ),
                           );
                         }
@@ -122,7 +163,7 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
     );
   }
 
-  void _deleteItem(int index) {
+  void _deleteItem(int index, ActivityItem item) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -136,7 +177,16 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
           TextButton(
             onPressed: () {
               setState(() {
-                store.deleteItem(selectedCategory, index);
+                if (selectedCategory == 'Semua') {
+                  final itemCategory = store.getCategoryForItem(item);
+                  final itemIndex = store.getIndexInCategory(
+                    itemCategory,
+                    item,
+                  );
+                  store.deleteItem(itemCategory, itemIndex);
+                } else {
+                  store.deleteItem(selectedCategory, index);
+                }
               });
               Navigator.pop(context);
             },
@@ -149,7 +199,9 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final items = store.itemsFor(selectedCategory);
+    final items = selectedCategory == 'Semua'
+        ? store.allItems()
+        : store.itemsFor(selectedCategory);
 
     return Scaffold(
       backgroundColor: const Color(0xFFDBF7FF),
@@ -235,14 +287,20 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                   underline: const SizedBox(),
                   isExpanded: true,
                   icon: const Icon(Icons.expand_more),
-                  items: store.categories
-                      .map(
-                        (category) => DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        ),
-                      )
-                      .toList(),
+                  items: [
+                    const DropdownMenuItem(
+                      value: 'Semua',
+                      child: Text('Semua'),
+                    ),
+                    ...store.categories
+                        .map(
+                          (category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          ),
+                        )
+                        .toList(),
+                  ],
                   onChanged: (value) {
                     if (value == null) return;
                     setState(() {
@@ -286,6 +344,9 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final item = items[index];
+                        final itemCategory = selectedCategory == 'Semua'
+                            ? store.getCategoryForItem(item)
+                            : selectedCategory;
                         return Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -309,19 +370,28 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                                   height: 150,
                                   width: double.infinity,
                                   color: Colors.grey[300],
-                                  child: Image.asset(
-                                    'assets/images/Golden Pavillion.png',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey[300],
-                                        child: const Icon(
-                                          Icons.image,
-                                          color: Colors.grey,
+                                  child: item.imagePath != null
+                                      ? Image.asset(
+                                          item.imagePath!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[300],
+                                                  child: const Icon(
+                                                    Icons.image,
+                                                    color: Colors.grey,
+                                                  ),
+                                                );
+                                              },
+                                        )
+                                      : Container(
+                                          color: Colors.grey[300],
+                                          child: const Icon(
+                                            Icons.image,
+                                            color: Colors.grey,
+                                          ),
                                         ),
-                                      );
-                                    },
-                                  ),
                                 ),
 
                                 // Content
@@ -360,7 +430,7 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                                                   BorderRadius.circular(8),
                                             ),
                                             child: Text(
-                                              selectedCategory,
+                                              itemCategory,
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w600,
@@ -371,6 +441,28 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 8),
+
+                                      // Date
+                                      if (item.date != null)
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.calendar_today,
+                                              size: 16,
+                                              color: Colors.black54,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              '${item.date!.day}/${item.date!.month}/${item.date!.year}',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      if (item.date != null)
+                                        const SizedBox(height: 8),
 
                                       // Location
                                       if (item.location.isNotEmpty)
@@ -453,7 +545,7 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                                               height: 40,
                                               child: ElevatedButton.icon(
                                                 onPressed: () =>
-                                                    _deleteItem(index),
+                                                    _deleteItem(index, item),
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: Colors.red,
                                                   foregroundColor: Colors.white,

@@ -31,6 +31,13 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _animationController.forward();
+
+    // Navigate to login screen after 5 seconds
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    });
   }
 
   @override

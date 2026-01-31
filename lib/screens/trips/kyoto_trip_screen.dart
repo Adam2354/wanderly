@@ -1,49 +1,14 @@
 import 'package:flutter/material.dart';
 import 'detail_screen.dart';
+import '../../data/activity_store.dart';
 
 class KyotoTripScreen extends StatelessWidget {
   const KyotoTripScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final attractions = [
-      {
-        'name': 'Golden Pavilion',
-        'description': 'Kuil terkenal dengan ribuan torii gate merah',
-        'image': 'assets/images/Golden Pavillion.png',
-        'rating': '4.8/5',
-      },
-      {
-        'name': 'Arashiyama Bamboo Grove',
-        'description': 'Hutan bambu yang indah dan menenangkan',
-        'image': 'assets/images/Busan.png',
-        'rating': '4.7/5',
-      },
-      {
-        'name': 'Kinkaku-ji (Golden Pavilion)',
-        'description': 'Paviliun emas yang menakjubkan di tepi danau',
-        'image': 'assets/images/Bangkok.png',
-        'rating': '4.9/5',
-      },
-      {
-        'name': 'Gion District',
-        'description': 'Kawasan tradisional dengan rumah geisha kuno',
-        'image': 'assets/images/Bar1.png',
-        'rating': '4.6/5',
-      },
-      {
-        'name': 'Kiyomizu-dera Temple',
-        'description': 'Kuil terkenal dengan pemandangan kota Kyoto',
-        'image': 'assets/images/Bar2.png',
-        'rating': '4.7/5',
-      },
-      {
-        'name': 'Philosopher\'s Path',
-        'description': 'Jalur pejalan kaki indah sepanjang kanal',
-        'image': 'assets/images/Bar3.png',
-        'rating': '4.5/5',
-      },
-    ];
+    final store = ActivityStore.instance;
+    final attractions = store.allItems();
 
     return Scaffold(
       backgroundColor: const Color(0xFFDBF7FF),
@@ -105,7 +70,11 @@ class KyotoTripScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushNamed(context, '/activities');
                       },
-                      icon: const Icon(Icons.list, size: 24, color: Colors.white),
+                      icon: const Icon(
+                        Icons.list,
+                        size: 24,
+                        color: Colors.white,
+                      ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
                         minWidth: 44,
@@ -149,13 +118,12 @@ class KyotoTripScreen extends StatelessWidget {
                 separatorBuilder: (_, __) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final attraction = attractions[index];
+                  final category = store.getCategoryForItem(attraction);
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const DetailScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const DetailScreen()),
                       );
                     },
                     child: Container(
@@ -181,19 +149,28 @@ class KyotoTripScreen extends StatelessWidget {
                               height: 150,
                               width: double.infinity,
                               color: Colors.grey[300],
-                              child: Image.asset(
-                                attraction['image'] as String,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(
-                                      Icons.image,
-                                      color: Colors.grey,
+                              child: attraction.imagePath != null
+                                  ? Image.asset(
+                                      attraction.imagePath!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.image,
+                                                color: Colors.grey,
+                                              ),
+                                            );
+                                          },
+                                    )
+                                  : Container(
+                                      color: Colors.grey[300],
+                                      child: const Icon(
+                                        Icons.image,
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  );
-                                },
-                              ),
                             ),
 
                             // Content
@@ -211,7 +188,7 @@ class KyotoTripScreen extends StatelessWidget {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          attraction['name'] as String,
+                                          attraction.name,
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
@@ -227,13 +204,14 @@ class KyotoTripScreen extends StatelessWidget {
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFF2F4BB9),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
-                                          attraction['rating'] as String,
+                                          category,
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white,
                                           ),
@@ -243,16 +221,44 @@ class KyotoTripScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 8),
 
-                                  // Description
-                                  Text(
-                                    attraction['description'] as String,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black54,
-                                      height: 1.5,
+                                  // Location
+                                  if (attraction.location.isNotEmpty)
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on,
+                                          size: 16,
+                                          color: Colors.black54,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            attraction.location,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  const SizedBox(height: 12),
+                                  if (attraction.location.isNotEmpty)
+                                    const SizedBox(height: 8),
+
+                                  // Notes
+                                  if (attraction.notes.isNotEmpty)
+                                    Text(
+                                      attraction.notes,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black45,
+                                        height: 1.5,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  if (attraction.notes.isNotEmpty)
+                                    const SizedBox(height: 12),
 
                                   // Action Button
                                   SizedBox(
@@ -265,20 +271,23 @@ class KyotoTripScreen extends StatelessWidget {
                                         ).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                              'Menambahkan ${attraction['name']} ke itinerary...',
+                                              'Menambahkan ${attraction.name} ke itinerary...',
                                             ),
-                                            duration:
-                                                const Duration(seconds: 2),
+                                            duration: const Duration(
+                                              seconds: 2,
+                                            ),
                                           ),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF2F4BB9),
+                                        backgroundColor: const Color(
+                                          0xFF2F4BB9,
+                                        ),
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                       ),
                                       child: const Text(
