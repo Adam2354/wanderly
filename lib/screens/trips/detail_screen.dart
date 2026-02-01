@@ -49,7 +49,10 @@ class DetailScreen extends StatelessWidget {
                 // Info Section
                 Container(
                   color: const Color(0xFFB8E6F5),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -145,7 +148,10 @@ class DetailScreen extends StatelessWidget {
                     children: [
                       const Text(
                         'Detail',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       const Text(
@@ -209,7 +215,10 @@ class DetailScreen extends StatelessWidget {
                       // Hotel nearest section
                       const Text(
                         'Hotel nearest Golden Pavillion',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -246,7 +255,8 @@ class DetailScreen extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.all(10.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: const [
                                         Text(
                                           'Urban Hotel Kyoto Nijo Premium',
@@ -270,7 +280,9 @@ class DetailScreen extends StatelessWidget {
                                                 SizedBox(width: 4),
                                                 Text(
                                                   '4.1/5',
-                                                  style: TextStyle(fontSize: 12),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -322,7 +334,8 @@ class DetailScreen extends StatelessWidget {
                                   Padding(
                                     padding: const EdgeInsets.all(10.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: const [
                                         Text(
                                           'Roku Kyoto resort by Hilton',
@@ -346,7 +359,9 @@ class DetailScreen extends StatelessWidget {
                                                 SizedBox(width: 4),
                                                 Text(
                                                   '4.5/5',
-                                                  style: TextStyle(fontSize: 12),
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -385,32 +400,50 @@ class DetailScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 24,
+                          horizontal: 20,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Image.asset('assets/images/logo_wanderly.png', height: 50),
+                            Image.asset(
+                              'assets/images/logo_wanderly.png',
+                              height: 50,
+                            ),
                             const SizedBox(height: 12),
                             const Text(
                               'Enjoy your trip with glorious serve from harisenin.com!',
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             const Text(
                               'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor\nTengah, Kota Bogor, Jawa Barat, 16167, Indonesia',
-                              style: TextStyle(fontSize: 11, color: Colors.black54),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.black54,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             const Text(
                               '+62-891827-23293',
-                              style: TextStyle(fontSize: 11, color: Colors.black54),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.black54,
+                              ),
                             ),
                             const SizedBox(height: 12),
                             Image.asset('assets/images/Sosmed.png', height: 32),
                             const SizedBox(height: 12),
                             const Text(
                               '©2026 Khoiri Rizki Bani Adam, All Rights Reserved',
-                              style: TextStyle(fontSize: 10, color: Colors.black38),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.black38,
+                              ),
                             ),
                           ],
                         ),

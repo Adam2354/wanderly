@@ -56,12 +56,15 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Kyoto Exploration',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                    const Expanded(
+                      child: Text(
+                        'Kyoto Exploration',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -515,11 +518,14 @@ class _ActivityCard extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 label,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
             ],
           ),

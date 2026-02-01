@@ -21,61 +21,73 @@ class HomeScreen extends StatelessWidget {
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: const AssetImage(
-                            'assets/images/Profile Image.png',
+                    // Profile Section
+                    Flexible(
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: const AssetImage(
+                              'assets/images/Profile Image.png',
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Hi, Adam!',
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'Hi, Adam!',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Selamat Datang Di Wanderly',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 14,
+                                    color: Color.fromARGB(249, 0, 0, 0),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Selamat Datang Di Wanderly',
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: Color.fromARGB(249, 0, 0, 0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.logout,
-                          color: Color.fromARGB(223, 248, 5, 5),
-                          size: 24,
+                    // Logout Button
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {},
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.logout,
+                            color: Colors.red,
+                            size: 22,
+                          ),
                         ),
                       ),
                     ),
@@ -168,7 +180,9 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            Row(
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 8,
                               children: [
                                 ElevatedButton(
                                   onPressed: () {},
@@ -193,7 +207,6 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
                                 OutlinedButton(
                                   onPressed: () {},
                                   style: OutlinedButton.styleFrom(
@@ -264,7 +277,10 @@ class HomeScreen extends StatelessWidget {
                               Container(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [],
+                                    colors: [
+                                      Colors.black.withOpacity(0.5),
+                                      Colors.black.withOpacity(0.1),
+                                    ],
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                   ),
