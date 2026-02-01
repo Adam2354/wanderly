@@ -15,6 +15,31 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   String selectedYear = '2025';
   bool isDateSelected = false;
   String? selectedActivity;
+  int _selectedIndex = 0;
+
+  void _onNavbarTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        // Home
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        break;
+      case 1:
+        // Search
+        Navigator.pushNamed(context, '/search');
+        break;
+      case 2:
+        // Messages
+        Navigator.pushNamed(context, '/messages');
+        break;
+      case 3:
+        // Profile
+        Navigator.pushNamed(context, '/profile');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -465,6 +490,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           showUnselectedLabels: false,
           elevation: 0,
           backgroundColor: Colors.transparent,
+          currentIndex: _selectedIndex,
+          onTap: _onNavbarTapped,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
             BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),

@@ -2,8 +2,35 @@ import 'package:flutter/material.dart';
 import 'detail_screen.dart';
 import '../../data/activity_store.dart';
 
-class KyotoTripScreen extends StatelessWidget {
+class KyotoTripScreen extends StatefulWidget {
   const KyotoTripScreen({super.key});
+
+  @override
+  State<KyotoTripScreen> createState() => _KyotoTripScreenState();
+}
+
+class _KyotoTripScreenState extends State<KyotoTripScreen> {
+  int _selectedIndex = 0;
+
+  void _onNavbarTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/search');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/messages');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +360,8 @@ class KyotoTripScreen extends StatelessWidget {
           showUnselectedLabels: false,
           elevation: 0,
           backgroundColor: Colors.transparent,
+          currentIndex: _selectedIndex,
+          onTap: _onNavbarTapped,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
             BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),

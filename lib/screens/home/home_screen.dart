@@ -1,8 +1,38 @@
 import 'package:flutter/material.dart';
 import '../trips/kyoto_trip_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onNavbarTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    switch (index) {
+      case 0:
+        // Home - already here
+        break;
+      case 1:
+        // Search
+        Navigator.pushNamed(context, '/search');
+        break;
+      case 2:
+        // Messages
+        Navigator.pushNamed(context, '/messages');
+        break;
+      case 3:
+        // Profile
+        Navigator.pushNamed(context, '/profile');
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +41,7 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 16.0,
-            ),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -68,7 +95,64 @@ class HomeScreen extends StatelessWidget {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                content: const Text(
+                                  'Apakah Anda yakin ingin keluar?',
+                                  style: TextStyle(fontFamily: 'Urbanist'),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text(
+                                      'Batal',
+                                      style: TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Logout berhasil'),
+                                          duration: Duration(seconds: 2),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFE74C3C),
+                                    ),
+                                    child: const Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.all(10),
@@ -185,7 +269,9 @@ class HomeScreen extends StatelessWidget {
                               runSpacing: 8,
                               children: [
                                 ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/detail');
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     foregroundColor: Colors.black87,
@@ -208,7 +294,15 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                                 OutlinedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const KyotoTripScreen(),
+                                      ),
+                                    );
+                                  },
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.white,
                                     side: const BorderSide(
@@ -224,7 +318,7 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   ),
                                   child: const Text(
-                                    'Discover More',
+                                    'Jelajahi Lebih Lanjut',
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontWeight: FontWeight.w600,
@@ -663,6 +757,8 @@ class HomeScreen extends StatelessWidget {
           showUnselectedLabels: false,
           elevation: 0,
           backgroundColor: Colors.transparent,
+          currentIndex: _selectedIndex,
+          onTap: _onNavbarTapped,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
             BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),

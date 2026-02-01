@@ -6,6 +6,9 @@ import 'screens/home/home_screen.dart';
 import 'screens/trips/detail_screen.dart';
 import 'screens/itinerary/itinerary_screen.dart';
 import 'screens/itinerary/my_itinerary_screen.dart';
+import 'screens/search/search_screen.dart';
+import 'screens/messages/messages_screen.dart';
+import 'screens/profile/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,6 +35,9 @@ class MyApp extends StatelessWidget {
         '/detail': (context) => const DetailScreen(),
         '/itinerary': (context) => const ItineraryScreen(),
         '/activities': (context) => const MyItineraryScreen(),
+        '/search': (context) => const SearchScreen(),
+        '/messages': (context) => const MessagesScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

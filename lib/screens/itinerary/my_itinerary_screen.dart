@@ -32,132 +32,155 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
     );
     final notesController = TextEditingController(text: existing?.notes ?? '');
     DateTime? selectedDate = existing?.date;
-
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Edit Wisata',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Edit Wisata',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nama wisata',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: locationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Lokasi',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Catatan (opsional)',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 2,
-                ),
-                const SizedBox(height: 12),
-                StatefulBuilder(
-                  builder: (context, setDialogState) => InkWell(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate ?? DateTime.now(),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2030),
-                      );
-                      if (picked != null) {
-                        setDialogState(() {
-                          selectedDate = picked;
-                        });
-                      }
-                    },
-                    child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Tanggal kunjungan (opsional)',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.calendar_today),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nama wisata',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
                       ),
-                      child: Text(
-                        selectedDate != null
-                            ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
-                            : 'Pilih tanggal',
-                        style: TextStyle(
-                          color: selectedDate != null
-                              ? Colors.black
-                              : Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: locationController,
+                    decoration: const InputDecoration(
+                      labelText: 'Lokasi',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: notesController,
+                    decoration: const InputDecoration(
+                      labelText: 'Catatan (opsional)',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 10),
+                  StatefulBuilder(
+                    builder: (context, setDialogState) => InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                        );
+                        if (picked != null) {
+                          setDialogState(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Tanggal kunjungan (opsional)',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          suffixIcon: Icon(Icons.calendar_today),
+                        ),
+                        child: Text(
+                          selectedDate != null
+                              ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                              : 'Pilih tanggal',
+                          style: TextStyle(
+                            color: selectedDate != null
+                                ? Colors.black
+                                : Colors.black54,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Batal'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        final name = nameController.text.trim();
-                        if (name.isEmpty) return;
-
-                        final location = locationController.text.trim();
-                        final notes = notesController.text.trim();
-
-                        setState(() {
-                          if (existing != null && index != null) {
-                            final itemCategory = selectedCategory == 'Semua'
-                                ? store.getCategoryForItem(existing)
-                                : selectedCategory;
-                            store.updateItem(
-                              itemCategory,
-                              store.getIndexInCategory(itemCategory, existing),
-                              ActivityItem(
-                                name: name,
-                                location: location,
-                                notes: notes,
-                                date: selectedDate,
-                                imagePath: existing.imagePath,
-                              ),
-                            );
-                          }
-                        });
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2F4BB9),
-                        foregroundColor: Colors.white,
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Batal'),
                       ),
-                      child: const Text('Simpan'),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          final name = nameController.text.trim();
+                          if (name.isEmpty) return;
+
+                          final location = locationController.text.trim();
+                          final notes = notesController.text.trim();
+
+                          setState(() {
+                            if (existing != null && index != null) {
+                              final itemCategory = selectedCategory == 'Semua'
+                                  ? store.getCategoryForItem(existing)
+                                  : selectedCategory;
+                              store.updateItem(
+                                itemCategory,
+                                store.getIndexInCategory(
+                                  itemCategory,
+                                  existing,
+                                ),
+                                ActivityItem(
+                                  name: name,
+                                  location: location,
+                                  notes: notes,
+                                  date: selectedDate,
+                                  imagePath: existing.imagePath,
+                                ),
+                              );
+                            }
+                          });
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2F4BB9),
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Simpan'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
