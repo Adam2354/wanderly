@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'detail_screen.dart';
 import '../../data/activity_store.dart';
 
+// 💎 `KyotoTripScreen` dengan visualisasi list destinasi yang bersih dan 
+// penggunaan `GestureDetector` untuk navigasi detail sudah sangat seamless! 🏯⛩️
 class KyotoTripScreen extends StatefulWidget {
   const KyotoTripScreen({super.key});
 

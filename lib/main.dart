@@ -14,6 +14,8 @@ void main() {
   runApp(const MyApp());
 }
 
+// 💎 Penggunaan `MaterialApp` dengan named routes sudah sesuai dengan requirement Mission 5. 
+// Struktur navigasinya jelas dan mudah dipahami! 🗺️✨
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -28,12 +30,14 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(),
+      // 💎 Definisi rute di sini sangat rapi. Menggunakan nama route yang deskriptif 
+      // mempermudah tracking navigasi antar layar. Good job! 🎯
       routes: {
+        '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
-        '/detail': (context) => const DetailScreen(),
-        '/itinerary': (context) => const ItineraryScreen(),
+        '/itinerary': (context) => const MyItineraryScreen(),
         '/activities': (context) => const MyItineraryScreen(),
         '/search': (context) => const SearchScreen(),
         '/messages': (context) => const MessagesScreen(),

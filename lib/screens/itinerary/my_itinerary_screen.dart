@@ -10,6 +10,8 @@ class MyItineraryScreen extends StatefulWidget {
   State<MyItineraryScreen> createState() => _MyItineraryScreenState();
 }
 
+// 💎 Penggunaan `ActivityStore.instance` menunjukkan pemahaman yang baik tentang 
+// pattern Singleton untuk manajemen data. Mantap! 🏗️
 class _MyItineraryScreenState extends State<MyItineraryScreen> {
   final ActivityStore store = ActivityStore.instance;
 
@@ -32,6 +34,8 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
     );
     final notesController = TextEditingController(text: existing?.notes ?? '');
     DateTime? selectedDate = existing?.date;
+    // 💎 Penggunaan `showDialog` untuk form edit/tambah adalah pilihan UX yang 
+    // intuitif dan hemat ruang layar. Keren! 📝📲
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -148,6 +152,8 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                           final location = locationController.text.trim();
                           final notes = notesController.text.trim();
 
+                          // 💎 Penggunaan `setState` di sini tepat sasaran untuk memperbarui UI setelah 
+                          // melakukan update data di `ActivityStore`. Sesuai requirement! ✅
                           setState(() {
                             if (existing != null && index != null) {
                               final itemCategory = selectedCategory == 'Semua'
@@ -201,6 +207,8 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
           ),
           TextButton(
             onPressed: () {
+              // 💎 Dialog konfirmasi hapus ini sangat penting untuk UX. 
+              // State update-nya juga sudah bersih dan terorganisir. 🗑️👌
               setState(() {
                 if (selectedCategory == 'Semua') {
                   final itemCategory = store.getCategoryForItem(item);
@@ -311,6 +319,8 @@ class _MyItineraryScreenState extends State<MyItineraryScreen> {
                   ],
                 ),
                 child: DropdownButton<String>(
+                  // 💎 Filter kategori menggunakan `DropdownButton` sangat memudahkan user 
+                  // untuk mengelola itinerary yang padat. UX yang matang! 🔍💎
                   value: selectedCategory,
                   underline: const SizedBox(),
                   isExpanded: true,

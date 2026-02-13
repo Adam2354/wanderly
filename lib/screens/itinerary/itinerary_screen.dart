@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../data/activity_store.dart';
 import 'my_itinerary_screen.dart';
 
+// 💎 `ItineraryScreen` menggunakan `DropdownButton` untuk pemilihan tanggal 
+// yang sangat interaktif dan meminimalisir kesalahan input user. Brilliant! 📅✨
 class ItineraryScreen extends StatefulWidget {
   const ItineraryScreen({super.key});
 
@@ -147,6 +149,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                                         ),
                                       )
                                       .toList(),
+                              // 💎 Implementasi Dropdown untuk tanggal, bulan, tahun sangat user-friendly. 
+                              // Perubahan state via `setState` di sini sudah sangat tepat! 📅✅
                               onChanged: (value) {
                                 if (value != null) {
                                   setState(() {

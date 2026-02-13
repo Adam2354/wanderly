@@ -1,6 +1,7 @@
 # wanderly
 
-A new Flutter project.
+// 🚩 Saran: Dokumentasi README masih bawaan. Ceritakan tantanganmu selama 
+// mengerjakan Mission 5 dan fitur favoritmu di sini! ✍️🏁
 
 ## Getting Started
 
