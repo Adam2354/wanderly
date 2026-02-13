@@ -12,6 +12,8 @@ class MyItineraryScreen extends ConsumerStatefulWidget {
   ConsumerState<MyItineraryScreen> createState() => _MyItineraryScreenState();
 }
 
+// 💎 Penggunaan `ActivityStore.instance` menunjukkan pemahaman yang baik tentang
+// pattern Singleton untuk manajemen data. Mantap! 🏗️
 class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
   late String selectedCategory;
 
@@ -31,7 +33,8 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
     );
     final notesController = TextEditingController(text: existing?.notes ?? '');
     DateTime? selectedDate = existing?.date;
-
+    // 💎 Penggunaan `showDialog` untuk form edit/tambah adalah pilihan UX yang
+    // intuitif dan hemat ruang layar. Keren! 📝📲
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -340,11 +343,13 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                       ],
                     ),
                     child: DropdownButton<String>(
-                      value: selectedCategory,
-                      underline: const SizedBox(),
-                      isExpanded: true,
-                      icon: const Icon(Icons.expand_more),
-                      items: categories
+                      // 💎 Filter kategori menggunakan `DropdownButton` sangat memudahkan user
+                  // untuk mengelola itinerary yang padat. UX yang matang! 🔍💎
+                  value: selectedCategory,
+                  underline: const SizedBox(),
+                  isExpanded: true,
+                  icon: const Icon(Icons.expand_more),
+                  items: categories
                           .map(
                             (category) => DropdownMenuItem(
                               value: category,

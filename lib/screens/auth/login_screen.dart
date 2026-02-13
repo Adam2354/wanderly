@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
+// 💎 `LoginScreen` yang memiliki `GestureDetector` untuk unfocus keyboard 
+// adalah praktik UX yang sangat baik. Detail yang penting! 🛡️📱
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -158,7 +160,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // Continue button
+                      // 💎 Logic login dengan dummy data ini sangat membantu untuk demo! 
+                      // SnackBar-nya juga informatif untuk user. Good job! 🛡️✨
                       SizedBox(
                         width: double.infinity,
                         height: 52,

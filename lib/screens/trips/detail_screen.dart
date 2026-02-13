@@ -185,6 +185,8 @@ class DetailScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                          // 💎 Detail section ini sangat komplet. Penggunaan `SingleChildScrollView` 
+                          // memastikan konten aman di layar yang lebih kecil. Rapi! 📱✨
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/itinerary');

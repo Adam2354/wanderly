@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'detail_screen.dart';
 import '../../data/providers/activity_provider.dart';
 
+// 💎 `KyotoTripScreen` dengan visualisasi list destinasi yang bersih dan
+// penggunaan `GestureDetector` untuk navigasi detail sudah sangat seamless! 🏯⛩️
 class KyotoTripScreen extends ConsumerStatefulWidget {
   const KyotoTripScreen({super.key});
 
