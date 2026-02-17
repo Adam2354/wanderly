@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../data/activity_store.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/activity_model.dart';
+import '../../data/providers/activity_provider.dart';
 import 'my_itinerary_screen.dart';
 
-class ItineraryScreen extends StatefulWidget {
+class ItineraryScreen extends ConsumerStatefulWidget {
   const ItineraryScreen({super.key});
 
   @override
-  State<ItineraryScreen> createState() => _ItineraryScreenState();
+  ConsumerState<ItineraryScreen> createState() => _ItineraryScreenState();
 }
 
-class _ItineraryScreenState extends State<ItineraryScreen> {
+class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
   String selectedDay = '24';
   String selectedMonth = 'Sep';
   String selectedYear = '2025';
@@ -23,7 +25,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     });
     switch (index) {
       case 0:
-        // Home
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         break;
       case 1:
@@ -257,21 +258,23 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    // Book Button - Full Width
                     SizedBox(
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
                         onPressed: selectedActivity != null
                             ? () {
-                                ActivityStore.instance.addItem(
-                                  selectedActivity!,
-                                  ActivityItem(
-                                    name: 'Kyoto Exploration',
-                                    location: 'Kyoto, Japan',
-                                    notes: 'Ditambahkan dari itinerary',
-                                  ),
+                                // Add activity using Riverpod provider
+                                final activity = ActivityModel(
+                                  name: 'Kyoto Exploration',
+                                  location: 'Kyoto, Japan',
+                                  notes: 'Ditambahkan dari itinerary',
+                                  category: selectedActivity!,
                                 );
+                                ref
+                                    .read(activitiesProvider.notifier)
+                                    .addActivity(activity);
+
                                 showDialog(
                                   context: context,
                                   barrierDismissible: true,

@@ -17,18 +17,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     switch (index) {
       case 0:
-        // Home - already here
         break;
       case 1:
-        // Search
         Navigator.pushNamed(context, '/search');
         break;
       case 2:
-        // Messages
         Navigator.pushNamed(context, '/messages');
         break;
       case 3:
-        // Profile
         Navigator.pushNamed(context, '/profile');
         break;
     }
@@ -45,12 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Profile Section
                     Flexible(
                       child: Row(
                         children: [
@@ -91,7 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    // Logout Button
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
@@ -179,7 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Search bar
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -216,7 +208,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Banner
                 Container(
                   height: 130,
                   decoration: BoxDecoration(

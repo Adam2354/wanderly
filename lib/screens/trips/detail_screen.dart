@@ -15,7 +15,6 @@ class DetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Hero Image with back button
                 Stack(
                   children: [
                     Image.asset(
@@ -48,7 +47,6 @@ class DetailScreen extends StatelessWidget {
                   ],
                 ),
 
-                // Info Section
                 Container(
                   color: const Color(0xFFB8E6F5),
                   padding: const EdgeInsets.symmetric(
@@ -58,7 +56,6 @@ class DetailScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Location
                       Expanded(
                         child: Row(
                           children: const [
@@ -76,7 +73,6 @@ class DetailScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Visitor
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -107,7 +103,6 @@ class DetailScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Rating
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
