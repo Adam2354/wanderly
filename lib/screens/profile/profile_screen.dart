@@ -200,21 +200,71 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Reset Data'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            insetPadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 24,
+                            ),
+                            titlePadding: const EdgeInsets.fromLTRB(
+                              20,
+                              20,
+                              20,
+                              8,
+                            ),
+                            contentPadding: const EdgeInsets.fromLTRB(
+                              20,
+                              0,
+                              20,
+                              16,
+                            ),
+                            actionsPadding: const EdgeInsets.fromLTRB(
+                              16,
+                              0,
+                              16,
+                              16,
+                            ),
+                            title: const Text(
+                              'Reset Data',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                             content: const Text(
-                              'Ini akan menghapus semua data dan reload 14 sample data Kyoto Exploration. Lanjutkan?',
+                              'Ini akan menghapus semua data dan reload sample Kyoto Exploration. Lanjutkan?',
+                              style: TextStyle(fontSize: 14, height: 1.4),
                             ),
                             actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Batal'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2F4BB9),
+                              SizedBox(
+                                height: 40,
+                                child: TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.black54,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: const Text('Batal'),
                                 ),
-                                child: const Text('Reset'),
+                              ),
+                              SizedBox(
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF2F4BB9),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: const Text('Reset'),
+                                ),
                               ),
                             ],
                           ),
