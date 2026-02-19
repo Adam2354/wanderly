@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'data/services/hive_service.dart';
-import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/trips/detail_screen.dart';
-import 'screens/itinerary/itinerary_screen.dart';
 import 'screens/itinerary/my_itinerary_screen.dart';
-import 'screens/search/search_screen.dart';
 import 'screens/messages/messages_screen.dart';
 import 'screens/profile/profile_screen.dart';
+import 'screens/search/search_screen.dart';
+import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

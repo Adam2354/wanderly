@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 
 // 💎 `RegisterScreen` dengan form yang sangat lengkap (Gender, Phone, Password) 
 // dan dekoratif `Positioned` circles yang membuat UI tidak membosankan. Awesome! 🚀✨

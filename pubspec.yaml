@@ -38,8 +38,8 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
-// 🚩 Catatan: Dependency sangat minimalist. Memang cukup, tapi eksplorasi package 
-// seperti `google_fonts` bisa bikin UI-mu makin 'stand out'! 📦💡
+# 🚩 Catatan: Dependency sangat minimalist. Memang cukup, tapi eksplorasi package 
+# seperti `google_fonts` bisa bikin UI-mu makin 'stand out'! 📦💡
 dev_dependencies:
   flutter_test:
     sdk: flutter
