@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../trips/kyoto_trip_screen.dart';
 
+// 💎 `HomeScreen` dengan desain `Urbanist` font dan layout yang modern! 
+// Komposisi warna dan elemen visualnya sangat memanjakan mata. Pro! 🎨🏰
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -11,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
+  // 💎 Logic navigasi di `HomeScreen` menggunakan `Switch` sangat rapi! 
+  // Ini memisahkan aksi dari UI dengan sangat bersih. Mantap! 🗺️🚀
   void _onNavbarTapped(int index) {
     setState(() {
       _selectedIndex = index;

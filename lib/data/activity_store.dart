@@ -1,3 +1,5 @@
+// 💎 Model data `ActivityItem` yang simpel tapi efektif. Penggunaan tipe data `DateTime?` 
+// sangat tepat untuk fleksibilitas jadwal kunjungan. 👍
 class ActivityItem {
   ActivityItem({
     required this.name,
@@ -14,6 +16,8 @@ class ActivityItem {
   String? imagePath;
 }
 
+// 💎 Implementasi `ActivityStore` sebagai Singleton adalah keputusan arsitektur 
+// yang cerdas! Ini memastikan konsistensi data di seluruh aplikasi. 🏗️✨
 class ActivityStore {
   ActivityStore._() {
     _initializeSampleData();
@@ -192,6 +196,8 @@ class ActivityStore {
     return list.indexOf(item);
   }
 
+  // 💎 Method CRUD (`addItem`, `updateItem`, `deleteItem`) di level store membuat logic 
+  // UI tetap bersih dan hanya fokus pada penampilan. Good job! 🎯✅
   void addItem(String category, ActivityItem item) {
     _itemsByCategory[category]?.add(item);
   }

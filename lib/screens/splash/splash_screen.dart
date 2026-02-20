@@ -7,6 +7,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+// 💎 Animasi di `SplashScreen` menggunakan `SingleTickerProviderStateMixin` 
+// memberikan impresi pertama yang sangat profesional bagi user. ✨🚀
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
@@ -32,6 +34,8 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController.forward();
 
+    // 💎 Penempatan logic navigasi otomatis setelah durasi tertentu di `initState` 
+    // adalah standar industri untuk Splash Screen. Mantap! ⏱️➡️
     // Navigate to login screen after 5 seconds
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {

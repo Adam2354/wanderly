@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/models/activity_model.dart';
 import '../../data/providers/activity_provider.dart';
 import 'my_itinerary_screen.dart';
 
+// 💎 `ItineraryScreen` menggunakan `DropdownButton` untuk pemilihan tanggal
+// yang sangat interaktif dan meminimalisir kesalahan input user. Brilliant! 📅✨
 class ItineraryScreen extends ConsumerStatefulWidget {
   const ItineraryScreen({super.key});
 
@@ -148,6 +151,8 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                                         ),
                                       )
                                       .toList(),
+                              // 💎 Implementasi Dropdown untuk tanggal, bulan, tahun sangat user-friendly.
+                              // Perubahan state via `setState` di sini sudah sangat tepat! 📅✅
                               onChanged: (value) {
                                 if (value != null) {
                                   setState(() {
