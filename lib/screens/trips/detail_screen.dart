@@ -7,8 +7,17 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final cardColor = Theme.of(context).cardColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFDBF7FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -48,7 +57,7 @@ class DetailScreen extends StatelessWidget {
                 ),
 
                 Container(
-                  color: const Color(0xFFB8E6F5),
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 18,
@@ -58,15 +67,16 @@ class DetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Row(
-                          children: const [
-                            Icon(Icons.location_on, size: 22),
-                            SizedBox(width: 8),
+                          children: [
+                            Icon(Icons.location_on, size: 22, color: textColor),
+                            const SizedBox(width: 8),
                             Flexible(
                               child: Text(
                                 'Kyoto, Japan',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
+                                  color: textColor,
                                 ),
                               ),
                             ),
@@ -76,9 +86,9 @@ class DetailScreen extends StatelessWidget {
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.person, size: 22),
-                            SizedBox(width: 8),
+                          children: [
+                            Icon(Icons.person, size: 22, color: textColor),
+                            const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
@@ -87,15 +97,16 @@ class DetailScreen extends StatelessWidget {
                                   'Visitor',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Colors.black54,
+                                    color: subTextColor,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   '65,034',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
+                                    color: textColor,
                                   ),
                                 ),
                               ],
@@ -106,9 +117,13 @@ class DetailScreen extends StatelessWidget {
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
-                          children: const [
-                            Icon(Icons.star, size: 22, color: Colors.orange),
-                            SizedBox(width: 8),
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              size: 22,
+                              color: Colors.orange,
+                            ),
+                            const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
@@ -117,15 +132,16 @@ class DetailScreen extends StatelessWidget {
                                   'Rating',
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: Colors.black54,
+                                    color: subTextColor,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   '8.5/10',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
+                                    color: textColor,
                                   ),
                                 ),
                               ],
@@ -143,20 +159,21 @@ class DetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Detail',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Embark on a tranquil journey to Japan\'s iconic Kinkaku-ji Temple, also known as the Golden Pavilion. Set against the serene backdrop of Kyoto\'s lush gardens and calm ponds, this Zen Buddhist temple radiates golden beauty and deep historical and spiritual significance. Wander along peaceful pathways while admiring the harmonious blend of nature and architecture, intricate details, and the temple\'s timeless cultural charm.',
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.6,
-                          color: Colors.black87,
+                          color: subTextColor,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -167,20 +184,21 @@ class DetailScreen extends StatelessWidget {
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 'Trip Price',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.black54,
+                                  color: subTextColor,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 '¥500',
                                 style: TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
+                                  color: textColor,
                                 ),
                               ),
                             ],
@@ -204,7 +222,10 @@ class DetailScreen extends StatelessWidget {
                             ),
                             child: const Text(
                               'Let\'s go',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -212,11 +233,12 @@ class DetailScreen extends StatelessWidget {
                       const SizedBox(height: 30),
 
                       // Hotel nearest section
-                      const Text(
+                      Text(
                         'Hotel nearest Golden Pavillion',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -227,11 +249,13 @@ class DetailScreen extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
+                                    color: isDark
+                                        ? Colors.black.withOpacity(0.4)
+                                        : Colors.black.withOpacity(0.08),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -256,36 +280,38 @@ class DetailScreen extends StatelessWidget {
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      children: const [
+                                      children: [
                                         Text(
                                           'Urban Hotel Kyoto Nijo Premium',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
+                                            color: textColor,
                                           ),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.star,
                                                   size: 14,
                                                   color: Colors.orange,
                                                 ),
-                                                SizedBox(width: 4),
+                                                const SizedBox(width: 4),
                                                 Text(
                                                   '4.1/5',
                                                   style: TextStyle(
                                                     fontSize: 12,
+                                                    color: subTextColor,
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            Text(
+                                            const Text(
                                               '¥7,500',
                                               style: TextStyle(
                                                 fontSize: 14,
@@ -306,11 +332,13 @@ class DetailScreen extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
+                                    color: isDark
+                                        ? Colors.black.withOpacity(0.4)
+                                        : Colors.black.withOpacity(0.08),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -335,36 +363,38 @@ class DetailScreen extends StatelessWidget {
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      children: const [
+                                      children: [
                                         Text(
                                           'Roku Kyoto resort by Hilton',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
+                                            color: textColor,
                                           ),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.star,
                                                   size: 14,
                                                   color: Colors.orange,
                                                 ),
-                                                SizedBox(width: 4),
+                                                const SizedBox(width: 4),
                                                 Text(
                                                   '4.5/5',
                                                   style: TextStyle(
                                                     fontSize: 12,
+                                                    color: subTextColor,
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            Text(
+                                            const Text(
                                               '¥131,000',
                                               style: TextStyle(
                                                 fontSize: 14,
@@ -389,10 +419,12 @@ class DetailScreen extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.06),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                               spreadRadius: 0,
@@ -411,37 +443,38 @@ class DetailScreen extends StatelessWidget {
                               height: 50,
                             ),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               'Enjoy your trip with glorious serve from harisenin.com!',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
+                                color: textColor,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor\nTengah, Kota Bogor, Jawa Barat, 16167, Indonesia',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.black54,
+                                color: subTextColor,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
+                            Text(
                               '+62-891827-23293',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.black54,
+                                color: subTextColor,
                               ),
                             ),
                             const SizedBox(height: 12),
                             Image.asset('assets/images/Sosmed.png', height: 32),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               '©2026 Khoiri Rizki Bani Adam, All Rights Reserved',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.black38,
+                                color: subTextColor.withOpacity(0.7),
                               ),
                             ),
                           ],

@@ -37,6 +37,16 @@ dependencies:
   flutter_riverpod: ^2.6.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  
+  # Firebase
+  firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
+  cloud_firestore: ^5.5.2
+  
+  # UI & State
+  shared_preferences: ^2.3.4
+  intl: ^0.19.0
+  image_picker: ^1.1.2
 
 # 🚩 Catatan: Dependency sangat minimalist. Memang cukup, tapi eksplorasi package
 # seperti `google_fonts` bisa bikin UI-mu makin 'stand out'! 📦💡

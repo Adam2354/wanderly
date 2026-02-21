@@ -39,9 +39,17 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
   @override
   Widget build(BuildContext context) {
     final attractionsAsync = ref.watch(activitiesProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final cardColor = Theme.of(context).cardColor;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFDBF7FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: attractionsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
@@ -74,11 +82,13 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardColor,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: isDark
+                                ? Colors.black.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.08),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -86,7 +96,11 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                       ),
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back, size: 24),
+                        icon: Icon(
+                          Icons.arrow_back,
+                          size: 24,
+                          color: textColor,
+                        ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(
                           minWidth: 44,
@@ -95,13 +109,13 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Kyoto Exploration',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: textColor,
                         ),
                       ),
                     ),
@@ -142,21 +156,18 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Destinasi Wisata Kyoto',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       '${attractions.length} destinasi menarik',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 13, color: subTextColor),
                     ),
                   ],
                 ),
@@ -182,11 +193,13 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.08),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                               spreadRadius: 1,
@@ -240,10 +253,10 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                         Expanded(
                                           child: Text(
                                             attraction.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w700,
-                                              color: Colors.black,
+                                              color: textColor,
                                             ),
                                           ),
                                         ),
@@ -276,18 +289,18 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                     if (attraction.location.isNotEmpty)
                                       Row(
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.location_on,
                                             size: 16,
-                                            color: Colors.black54,
+                                            color: subTextColor,
                                           ),
                                           const SizedBox(width: 6),
                                           Expanded(
                                             child: Text(
                                               attraction.location,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
-                                                color: Colors.black54,
+                                                color: subTextColor,
                                               ),
                                             ),
                                           ),
@@ -300,9 +313,9 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                     if (attraction.notes.isNotEmpty)
                                       Text(
                                         attraction.notes,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
-                                          color: Colors.black45,
+                                          color: subTextColor,
                                           height: 1.5,
                                         ),
                                         maxLines: 2,
@@ -314,7 +327,7 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                     // Action Button
                                     SizedBox(
                                       width: double.infinity,
-                                      height: 40,
+                                      height: 46,
                                       child: ElevatedButton(
                                         onPressed: () {
                                           ScaffoldMessenger.of(
@@ -335,6 +348,10 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                             0xFF2F4BB9,
                                           ),
                                           foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 10,
+                                          ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                               10,
@@ -346,6 +363,7 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                                           style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w600,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
@@ -368,10 +386,12 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: isDark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -380,11 +400,13 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFF2F4BB9),
-          unselectedItemColor: Colors.black45,
+          unselectedItemColor:
+              Theme.of(context).iconTheme.color?.withOpacity(0.6) ??
+              (isDark ? Colors.white60 : Colors.black45),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Theme.of(context).cardColor,
           currentIndex: _selectedIndex,
           onTap: _onNavbarTapped,
           items: const [

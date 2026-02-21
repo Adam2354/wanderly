@@ -71,18 +71,26 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFB8E6F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Pesan',
           style: TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w600,
             fontSize: 20,
-            color: Colors.black,
+            color: textColor,
           ),
         ),
         centerTitle: false,
@@ -99,15 +107,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: message['unread']
-                    ? Colors.blue.withOpacity(0.05)
-                    : Colors.white,
+                    ? Colors.blue.withOpacity(isDark ? 0.12 : 0.05)
+                    : Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
                 border: message['unread']
                     ? Border.all(color: Colors.blue.withOpacity(0.2))
                     : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withOpacity(isDark ? 0.25 : 0.04),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -144,7 +152,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                                     ? FontWeight.w700
                                     : FontWeight.w600,
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: textColor,
                               ),
                             ),
                             Text(
@@ -152,7 +160,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               style: TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 12,
-                                color: Colors.black.withOpacity(0.5),
+                                color: subTextColor,
                               ),
                             ),
                           ],
@@ -165,7 +173,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 12,
-                            color: Colors.black.withOpacity(0.6),
+                            color: subTextColor,
                           ),
                         ),
                       ],
@@ -188,10 +196,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: isDark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -200,11 +210,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFF2F4BB9),
-          unselectedItemColor: Colors.black45,
+          unselectedItemColor:
+              Theme.of(context).iconTheme.color?.withOpacity(0.6) ??
+              (isDark ? Colors.white60 : Colors.black45),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Theme.of(context).cardColor,
           currentIndex: _selectedIndex,
           onTap: _onNavbarTapped,
           items: const [

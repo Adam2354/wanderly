@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/models/activity_model.dart';
+import '../../data/providers/activity_provider.dart';
 import '../trips/kyoto_trip_screen.dart';
 
-// 💎 `HomeScreen` dengan desain `Urbanist` font dan layout yang modern! 
-// Komposisi warna dan elemen visualnya sangat memanjakan mata. Pro! 🎨🏰
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
 
-  // 💎 Logic navigasi di `HomeScreen` menggunakan `Switch` sangat rapi! 
-  // Ini memisahkan aksi dari UI dengan sangat bersih. Mantap! 🗺️🚀
   void _onNavbarTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -37,8 +35,54 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final cardColor = Theme.of(context).cardColor;
+    final activitiesAsync = ref.watch(activitiesProvider);
+    final activities = activitiesAsync.asData?.value ?? <ActivityModel>[];
+
+    final today = DateTime.now();
+    final datedActivities = activities.where((a) => a.date != null).toList();
+    int progressPercent = 0;
+    String statusLabel = 'Upcoming';
+    Color statusColor = const Color(0xFFF59E0B); // yellow
+
+    if (datedActivities.isNotEmpty) {
+      final normalizedDates =
+          datedActivities
+              .map((a) => DateTime(a.date!.year, a.date!.month, a.date!.day))
+              .toList()
+            ..sort();
+
+      final minDate = normalizedDates.first;
+      final maxDate = normalizedDates.last;
+      final todayDate = DateTime(today.year, today.month, today.day);
+
+      if (todayDate.isBefore(minDate)) {
+        statusLabel = 'Upcoming';
+        statusColor = const Color(0xFFF59E0B);
+      } else if (todayDate.isAfter(maxDate)) {
+        statusLabel = 'Completed';
+        statusColor = const Color(0xFF10B981);
+      } else {
+        statusLabel = 'Ongoing';
+        statusColor = const Color(0xFF2F4BB9);
+      }
+
+      final completedCount = normalizedDates
+          .where((d) => d.isBefore(todayDate))
+          .length;
+      progressPercent = ((completedCount / normalizedDates.length) * 100)
+          .round();
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFB8E6F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -63,24 +107,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           Flexible(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   'Hi, Adam!',
                                   style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: textColor,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
                                   'Selamat Datang Di Wanderly',
                                   style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 14,
-                                    color: Color.fromARGB(249, 0, 0, 0),
+                                    color: subTextColor,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -155,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
@@ -183,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -194,20 +238,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   child: Row(
-                    children: const [
-                      Icon(Icons.menu, color: Colors.black54, size: 24),
-                      SizedBox(width: 12),
+                    children: [
+                      Icon(Icons.menu, color: subTextColor, size: 24),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'Search your destination',
                           style: TextStyle(
                             fontFamily: 'Urbanist',
-                            color: Colors.black54,
+                            color: subTextColor,
                             fontSize: 15,
                           ),
                         ),
                       ),
-                      Icon(Icons.search, color: Colors.black54, size: 24),
+                      Icon(Icons.search, color: subTextColor, size: 24),
                     ],
                   ),
                 ),
@@ -355,13 +399,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(8),
                         child: SizedBox(
                           width: 130,
-                          height: 75,
+                          height: 88,
                           child: Stack(
                             children: [
                               Image.asset(
                                 'assets/images/kyoto1.png',
                                 width: 130,
-                                height: 75,
+                                height: 88,
                                 fit: BoxFit.cover,
                               ),
                               Container(
@@ -396,70 +440,84 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       // Text and Progress
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(14),
+                        child: SizedBox(
+                          height: 88,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: isDark
+                                    ? Colors.black.withOpacity(0.4)
+                                    : Colors.black.withOpacity(0.06),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                                 spreadRadius: 0,
                               ),
                             ],
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: const [
-                                  Text(
-                                    'Kyoto Exploration',
-                                    style: TextStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: Colors.black,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Kyoto Exploration',
+                                      style: TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: textColor,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '0%',
-                                    style: TextStyle(
-                                      fontFamily: 'Urbanist',
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '$progressPercent%',
+                                          style: TextStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: statusColor,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          statusLabel,
+                                          style: TextStyle(
+                                            fontFamily: 'Urbanist',
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                            color: subTextColor,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    minHeight: 6,
+                                    value: progressPercent / 100,
+                                    color: statusColor,
+                                    backgroundColor: isDark
+                                        ? Colors.white24
+                                        : const Color(0xFFE8E8E8),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-                              // Progress bar with blue dot
-                              Stack(
-                                alignment: Alignment.centerLeft,
-                                children: [
-                                  Container(
-                                    height: 4,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE8E8E8),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF2196F3),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -497,11 +555,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Container(
                         width: MediaQuery.of(context).size.width * 0.43,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.08),
                               blurRadius: 10,
                               offset: const Offset(0, 3),
                               spreadRadius: 1,
@@ -529,11 +589,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   Text(
                                     cities[index]['name'] as String,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+                                      color: textColor,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
@@ -541,11 +601,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     children: [
                                       Text(
                                         cities[index]['rating'] as String,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Urbanist',
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black87,
+                                          color: subTextColor,
                                         ),
                                       ),
                                       const SizedBox(width: 4),
@@ -617,11 +677,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 10),
                           Text(
                             popular[index]['name'] as String,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                              color: textColor,
                             ),
                           ),
                         ],
@@ -632,13 +692,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 18),
 
                 // Rancang Perjalanan Khusus
-                const Text(
+                Text(
                   'Rancang Perjalanan Khusus',
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: textColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -670,11 +730,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
+                            color: isDark
+                                ? Colors.black.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.06),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                             spreadRadius: 0,
@@ -699,30 +761,30 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   destinations[index]['title'] as String,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.w600,
                                     fontSize: 14,
-                                    color: Colors.black,
+                                    color: textColor,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   destinations[index]['location'] as String,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 12,
-                                    color: Colors.black54,
+                                    color: subTextColor,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.arrow_forward_ios,
                             size: 16,
-                            color: Colors.black54,
+                            color: subTextColor,
                           ),
                         ],
                       ),
@@ -736,10 +798,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -748,11 +812,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFF2F4BB9),
-          unselectedItemColor: Colors.black45,
+          unselectedItemColor:
+              Theme.of(context).iconTheme.color?.withOpacity(0.6) ??
+              (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white60
+                  : Colors.black45),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Theme.of(context).cardColor,
           currentIndex: _selectedIndex,
           onTap: _onNavbarTapped,
           items: const [
@@ -783,16 +851,22 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: textColor,
           ),
         ),
         GestureDetector(

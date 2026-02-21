@@ -1,16 +1,16 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/providers/auth_provider.dart';
 
-// 💎 `RegisterScreen` dengan form yang sangat lengkap (Gender, Phone, Password) 
-// dan dekoratif `Positioned` circles yang membuat UI tidak membosankan. Awesome! 🚀✨
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   late TextEditingController _fullNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
@@ -42,8 +42,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  Future<void> _handleRegister() async {
+    final fullName = _fullNameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nama, email, dan password harus diisi')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Password tidak cocok')));
+      return;
+    }
+
+    await ref
+        .read(authNotifierProvider.notifier)
+        .register(email, password, displayName: fullName);
+
+    // Check if registration successful
+    final authState = ref.read(authNotifierProvider);
+    authState.when(
+      data: (user) {
+        if (user != null) {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
+      },
+      loading: () {},
+      error: (error, _) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.toString())));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? const Color(0xFF121212)
+        : const Color(0xFFB8E6F5);
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black87);
+    final secondaryTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final hintColor = isDark ? Colors.white60 : Colors.black38;
+    final inputFill = isDark ? const Color(0xFF2C2C2C) : Colors.white;
+    final cardColor = Theme.of(context).cardColor;
+    final borderColor = isDark ? Colors.white24 : const Color(0xFFE0E0E0);
+
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -52,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          color: const Color(0xFFB8E6F5), // Light blue background
+          color: backgroundColor,
           child: Stack(
             children: [
               // Decorative circles at the bottom
@@ -86,9 +142,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       RichText(
                         text: TextSpan(
                           text: 'Sudah Punya Akun ? ',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black54,
+                            color: secondaryTextColor,
                           ),
                           children: [
                             TextSpan(
@@ -112,7 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Container(
                         constraints: const BoxConstraints(maxWidth: 500),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
@@ -127,39 +183,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Heading
-                            const Center(
+                            Center(
                               child: Text(
                                 'Daftar Akun',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: textColor,
                                 ),
                               ),
                             ),
                             const SizedBox(height: 16),
                             // Full Name input
-                            const Text(
+                            Text(
                               'Full Name *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _fullNameController,
+                              style: TextStyle(color: textColor),
+                              cursorColor: textColor,
+                              keyboardAppearance: isDark
+                                  ? Brightness.dark
+                                  : Brightness.light,
                               decoration: InputDecoration(
                                 hintText: 'Khoiru Rizki Bani Adam',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black38,
-                                ),
+                                hintStyle: TextStyle(color: hintColor),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: inputFill,
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -172,8 +228,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -185,27 +241,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Email input
-                            const Text(
+                            Text(
                               'Email *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _emailController,
+                              style: TextStyle(color: textColor),
+                              cursorColor: textColor,
+                              keyboardAppearance: isDark
+                                  ? Brightness.dark
+                                  : Brightness.light,
                               decoration: InputDecoration(
                                 hintText: 'khoirurizki@example.com',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black38,
-                                ),
+                                hintStyle: TextStyle(color: hintColor),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: inputFill,
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -218,8 +274,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -231,20 +287,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Gender dropdown
-                            const Text(
+                            Text(
                               'Jenis Kelamin *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: inputFill,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: const Color(0xFFE0E0E0),
+                                  color: borderColor,
                                   width: 1,
                                 ),
                               ),
@@ -257,19 +310,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     vertical: 16,
                                   ),
                                 ),
-                                items: const [
+                                dropdownColor: inputFill,
+                                style: TextStyle(color: textColor),
+                                items: [
                                   DropdownMenuItem(
                                     value: 'Pria',
                                     child: Text(
                                       'Pria',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                      ),
                                     ),
                                   ),
                                   DropdownMenuItem(
                                     value: 'Wanita',
                                     child: Text(
                                       'Wanita',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -282,12 +343,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Phone number input
-                            const Text(
+                            Text(
                               'No. Hp *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             Row(
@@ -298,10 +356,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: inputFill,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: const Color(0xFFE0E0E0),
+                                      color: borderColor,
                                       width: 1,
                                     ),
                                   ),
@@ -328,14 +386,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       DropdownButton<String>(
                                         value: _selectedCountryCode,
                                         underline: const SizedBox(),
-                                        items: const [
+                                        dropdownColor: inputFill,
+                                        style: TextStyle(color: textColor),
+                                        items: [
                                           DropdownMenuItem(
                                             value: '+62',
-                                            child: Text('+62'),
+                                            child: Text(
+                                              '+62',
+                                              style: TextStyle(
+                                                color: textColor,
+                                              ),
+                                            ),
                                           ),
                                           DropdownMenuItem(
                                             value: '+1',
-                                            child: Text('+1'),
+                                            child: Text(
+                                              '+1',
+                                              style: TextStyle(
+                                                color: textColor,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                         onChanged: (value) {
@@ -353,17 +423,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   child: TextField(
                                     controller: _phoneController,
                                     keyboardType: TextInputType.phone,
+                                    style: TextStyle(color: textColor),
+                                    cursorColor: textColor,
+                                    keyboardAppearance: isDark
+                                        ? Brightness.dark
+                                        : Brightness.light,
                                     decoration: InputDecoration(
                                       hintText: 'xxx-xxxx-xxxx',
-                                      hintStyle: const TextStyle(
-                                        color: Colors.black38,
-                                      ),
+                                      hintStyle: TextStyle(color: hintColor),
                                       filled: true,
-                                      fillColor: Colors.white,
+                                      fillColor: inputFill,
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFE0E0E0),
+                                        borderSide: BorderSide(
+                                          color: borderColor,
                                           width: 1,
                                         ),
                                       ),
@@ -376,8 +449,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFE0E0E0),
+                                        borderSide: BorderSide(
+                                          color: borderColor,
                                           width: 1,
                                         ),
                                       ),
@@ -393,28 +466,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Password input
-                            const Text(
+                            Text(
                               'Kata Sandi *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _passwordController,
                               obscureText: !_isPasswordVisible,
+                              style: TextStyle(color: textColor),
+                              cursorColor: textColor,
+                              keyboardAppearance: isDark
+                                  ? Brightness.dark
+                                  : Brightness.light,
                               decoration: InputDecoration(
                                 hintText: '**********',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black38,
-                                ),
+                                hintStyle: TextStyle(color: hintColor),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: inputFill,
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -427,8 +500,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -448,7 +521,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       _isPasswordVisible
                                           ? Icons.visibility
                                           : Icons.visibility_off,
-                                      color: Colors.black38,
+                                      color: hintColor,
                                     ),
                                   ),
                                 ),
@@ -456,28 +529,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             // Confirm Password input
-                            const Text(
+                            Text(
                               'Konfirmasi Kata Sandi *',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 14, color: textColor),
                             ),
                             const SizedBox(height: 8),
                             TextField(
                               controller: _confirmPasswordController,
                               obscureText: !_isConfirmPasswordVisible,
+                              style: TextStyle(color: textColor),
+                              cursorColor: textColor,
+                              keyboardAppearance: isDark
+                                  ? Brightness.dark
+                                  : Brightness.light,
                               decoration: InputDecoration(
                                 hintText: '**********',
-                                hintStyle: const TextStyle(
-                                  color: Colors.black38,
-                                ),
+                                hintStyle: TextStyle(color: hintColor),
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: inputFill,
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -490,8 +563,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFFE0E0E0),
+                                  borderSide: BorderSide(
+                                    color: borderColor,
                                     width: 1,
                                   ),
                                 ),
@@ -512,7 +585,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       _isConfirmPasswordVisible
                                           ? Icons.visibility
                                           : Icons.visibility_off,
-                                      color: Colors.black38,
+                                      color: hintColor,
                                     ),
                                   ),
                                 ),
@@ -524,47 +597,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               width: double.infinity,
                               height: 52,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  // Handle registration
-                                  if (_fullNameController.text.isEmpty ||
-                                      _emailController.text.isEmpty ||
-                                      _phoneController.text.isEmpty ||
-                                      _passwordController.text.isEmpty ||
-                                      _confirmPasswordController.text.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Semua field harus diisi!',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  if (_passwordController.text !=
-                                      _confirmPasswordController.text) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Password tidak cocok!'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  // Registration successful
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Registrasi berhasil! Silakan login.',
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-
-                                  // Navigate back to login
-                                  Navigator.of(context).pop();
+                                onPressed: () async {
+                                  await _handleRegister();
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF2F4BB9),
@@ -573,14 +607,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                   elevation: 0,
                                 ),
-                                child: const Text(
-                                  'Register',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                child: ref.watch(authLoadingProvider)
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Register',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                               ),
                             ),
                             const SizedBox(height: 12),

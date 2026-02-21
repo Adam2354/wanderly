@@ -37,21 +37,21 @@ class HiveService {
       'Golden Pavilion (Kinkaku-ji)': 'assets/images/Golden Pavillion.png',
       'Fushimi Inari Shrine': 'assets/images/Fushimi Inari.jpg',
       'Arashiyama Bamboo Grove': 'assets/images/Arashiyama-Bamboo-Grove.jpg',
-      'Kiyomizu-dera Temple': 'assets/images/kyoto1.png',
+      'Kiyomizu-dera Temple': 'assets/images/Kiyomizudera-Temple-Kyoto.jpg',
       'Kinkaku-ji Garden Walk': 'assets/images/kinkaku ji.jpg',
-      'Nijo Castle': 'assets/images/kyoto1.png',
+      'Nijo Castle': 'assets/images/Nijo-Castle-Kyoto-Japan.jpg',
       'Ichiran Ramen': 'assets/images/ichiran ramen.jpg',
       'Nishiki Warai': 'assets/images/nishiki warai.jpg',
       'Katsukura Tonkatsu': 'assets/images/katsukura.jpg',
-      'Pontocho Alley': 'assets/images/bar k6.jpg',
+      'Pontocho Alley': 'assets/images/pontocho-alley.jpg',
       'Gion District Night Walk': 'assets/images/gion district.jpg',
       'Bar K6 Kyoto': 'assets/images/bar k6.jpg',
-      'Kyoto Cocktail Bar': 'assets/images/Bar1.png',
-      'The Ritz-Carlton Kyoto': 'assets/images/kyoto granbel.jpg',
-      'Traditional Ryokan Yoshikawa': 'assets/images/Roku Kyoto.png',
+      'Kyoto Cocktail Bar': 'assets/images/kyoto-cocktail-bar.jpg',
+      'The Ritz-Carlton Kyoto': 'assets/images/the-ritz-carlton-kyoto.jpg',
+      'Traditional Ryokan Yoshikawa': 'assets/images/ryokan-yoshikawa.jpg',
       'Kyoto Granbell Hotel': 'assets/images/kyoto granbel.jpg',
       'Urban Hotel Kyoto': 'assets/images/Urban Hotel.png',
-      'Nishiki Market': 'assets/images/teramachi.jpg',
+      'Nishiki Market': 'assets/images/nishiki-market.jpg',
       'Teramachi Shopping Street': 'assets/images/teramachi.jpg',
       'Toei Kyoto Studio Park': 'assets/images/movix kyoto.jpg',
       'TOHO Cinemas Kyoto': 'assets/images/toho_cinema.jpg',
@@ -76,7 +76,7 @@ class HiveService {
         notes:
             'Kuil Budha yang indah dengan lapisan emas. Salah satu destinasi paling ikonik di Kyoto dengan refleksi emas di kolam.',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 15),
+        date: DateTime(2026, 2, 18),
         imagePath: 'assets/images/Golden Pavillion.png',
       ),
     );
@@ -88,7 +88,7 @@ class HiveService {
         notes:
             'Terkenal dengan ribuan gerbang torii berwarna merah yang membentang hingga ke puncak gunung. Kyoto Exploration highlight!',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 16),
+        date: DateTime(2026, 2, 19),
         imagePath: 'assets/images/Fushimi Inari.jpg',
       ),
     );
@@ -100,7 +100,7 @@ class HiveService {
         notes:
             'Hutan bambu yang menakjubkan dengan suara angin yang menenangkan. Perfect untuk Kyoto Exploration photos!',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 17),
+        date: DateTime(2026, 2, 20),
         imagePath: 'assets/images/Arashiyama-Bamboo-Grove.jpg',
       ),
     );
@@ -112,8 +112,8 @@ class HiveService {
         notes:
             'Kuil kayu bersejarah dengan pemandangan kota Kyoto yang spektakuler. Bagian dari Kyoto Exploration UNESCO World Heritage.',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 18),
-        imagePath: 'assets/images/kyoto1.png',
+        date: DateTime(2026, 2, 21),
+        imagePath: 'assets/images/Kiyomizudera-Temple-Kyoto.jpg',
       ),
     );
 
@@ -124,7 +124,7 @@ class HiveService {
         notes:
             'Jalan santai di taman sekitar Kinkaku-ji, suasananya adem dan fotogenik.',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 19),
+        date: DateTime(2026, 2, 22),
         imagePath: 'assets/images/kinkaku ji.jpg',
       ),
     );
@@ -136,8 +136,8 @@ class HiveService {
         notes:
             'Istana bersejarah dengan lantai “nightingale” yang khas, cocok buat wisata budaya.',
         category: 'Sightseeing',
-        date: DateTime(2026, 3, 20),
-        imagePath: 'assets/images/kyoto1.png',
+        date: DateTime(2026, 2, 23),
+        imagePath: 'assets/images/Nijo-Castle-Kyoto-Japan.jpg',
       ),
     );
 
@@ -149,7 +149,7 @@ class HiveService {
         notes:
             'Ramen tonkotsu yang terkenal dengan sistem makan solo. Must-try di Kyoto Exploration!',
         category: 'Restaurant',
-        date: DateTime(2026, 3, 15),
+        date: DateTime(2026, 2, 18),
         imagePath: 'assets/images/ichiran ramen.jpg',
       ),
     );
@@ -161,7 +161,7 @@ class HiveService {
         notes:
             'Okonomiyaki dan takoyaki yang enak di Nishiki Market. Local favorite untuk Kyoto Exploration food tour.',
         category: 'Restaurant',
-        date: DateTime(2026, 3, 16),
+        date: DateTime(2026, 2, 20),
         imagePath: 'assets/images/nishiki warai.jpg',
       ),
     );
@@ -173,7 +173,7 @@ class HiveService {
         notes:
             'Tonkatsu terbaik di Kyoto dengan kuah miso gratis. Kyoto Exploration culinary experience.',
         category: 'Restaurant',
-        date: DateTime(2026, 3, 17),
+        date: DateTime(2026, 2, 22),
         imagePath: 'assets/images/katsukura.jpg',
       ),
     );
@@ -185,8 +185,8 @@ class HiveService {
         notes:
             'Bar dan teahouse tradisional di sepanjang sungai Kamogawa. Best nightlife spot untuk Kyoto Exploration!',
         category: 'Nightlife',
-        date: DateTime(2026, 3, 17),
-        imagePath: 'assets/images/bar k6.jpg',
+        date: DateTime(2026, 2, 19),
+        imagePath: 'assets/images/pontocho-alley.jpg',
       ),
     );
 
@@ -197,7 +197,7 @@ class HiveService {
         notes:
             'Jalan-jalan malam di distrik Geisha, chance melihat Geisha atau Maiko. Kyoto Exploration cultural experience.',
         category: 'Nightlife',
-        date: DateTime(2026, 3, 16),
+        date: DateTime(2026, 2, 21),
         imagePath: 'assets/images/gion district.jpg',
       ),
     );
@@ -209,7 +209,7 @@ class HiveService {
         notes:
             'Bar kecil dengan suasana cozy, cocok buat nongkrong santai malam hari.',
         category: 'Nightlife',
-        date: DateTime(2026, 3, 18),
+        date: DateTime(2026, 2, 23),
         imagePath: 'assets/images/bar k6.jpg',
       ),
     );
@@ -221,7 +221,7 @@ class HiveService {
         notes:
             'Cocktail bar dengan vibe modern, pilihan minuman lumayan lengkap.',
         category: 'Nightlife',
-        date: DateTime(2026, 3, 19),
+        date: DateTime(2026, 2, 24),
         imagePath: 'assets/images/Bar1.png',
       ),
     );
@@ -234,8 +234,8 @@ class HiveService {
         notes:
             'Hotel bintang lima dengan pemandangan sungai Kamogawa dan pelayanan kelas dunia. Perfect untuk Kyoto Exploration luxury stay.',
         category: 'Hotel',
-        date: DateTime(2026, 3, 15),
-        imagePath: 'assets/images/kyoto granbel.jpg',
+        date: DateTime(2026, 2, 18),
+        imagePath: 'assets/images/the-ritz-carlton-kyoto.jpg',
       ),
     );
 
@@ -246,8 +246,8 @@ class HiveService {
         notes:
             'Penginapan tradisional Jepang dengan kaiseki dinner dan tatami rooms. Authentic Kyoto Exploration experience.',
         category: 'Hotel',
-        date: DateTime(2026, 3, 16),
-        imagePath: 'assets/images/Roku Kyoto.png',
+        date: DateTime(2026, 2, 21),
+        imagePath: 'assets/images/ryokan-yoshikawa.jpg',
       ),
     );
 
@@ -257,7 +257,7 @@ class HiveService {
         location: 'Gion, Kyoto, Japan',
         notes: 'Hotel modern dekat Gion, akses gampang ke spot wisata utama.',
         category: 'Hotel',
-        date: DateTime(2026, 3, 17),
+        date: DateTime(2026, 2, 22),
         imagePath: 'assets/images/kyoto granbel.jpg',
       ),
     );
@@ -268,7 +268,7 @@ class HiveService {
         location: 'Fushimi, Kyoto, Japan',
         notes: 'Hotel budget yang nyaman, cocok buat short stay di Kyoto.',
         category: 'Hotel',
-        date: DateTime(2026, 3, 18),
+        date: DateTime(2026, 2, 24),
         imagePath: 'assets/images/Urban Hotel.png',
       ),
     );
@@ -280,8 +280,8 @@ class HiveService {
         notes:
             'Pasar tradisional dengan 400 tahun sejarah, ribuan toko jual makanan & souvenir. Kyoto Exploration shopping paradise!',
         category: 'Shopping',
-        date: DateTime(2026, 3, 16),
-        imagePath: 'assets/images/teramachi.jpg',
+        date: DateTime(2026, 2, 20),
+        imagePath: 'assets/images/nishiki-market.jpg',
       ),
     );
 
@@ -292,7 +292,7 @@ class HiveService {
         notes:
             'Shopping arcade dengan toko tradisional dan modern. Great untuk Kyoto Exploration souvenir hunting.',
         category: 'Shopping',
-        date: DateTime(2026, 3, 17),
+        date: DateTime(2026, 2, 23),
         imagePath: 'assets/images/teramachi.jpg',
       ),
     );
@@ -304,7 +304,7 @@ class HiveService {
         notes:
             'Theme park studio film jaman Edo dengan live shows dan museum. Unique Kyoto Exploration entertainment!',
         category: 'Cinema',
-        date: DateTime(2026, 3, 18),
+        date: DateTime(2026, 2, 21),
         imagePath: 'assets/images/movix kyoto.jpg',
       ),
     );
@@ -315,7 +315,7 @@ class HiveService {
         location: 'Kyoto Station, Japan',
         notes: 'Bioskop modern buat nonton film santai malam hari.',
         category: 'Cinema',
-        date: DateTime(2026, 3, 19),
+        date: DateTime(2026, 2, 25),
         imagePath: 'assets/images/toho_cinema.jpg',
       ),
     );

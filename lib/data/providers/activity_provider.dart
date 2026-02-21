@@ -36,6 +36,30 @@ final categoriesProvider = Provider((ref) {
   ];
 });
 
+enum ActivityStatus { upcoming, ongoing, completed }
+
+enum ActivitySort { startDateAsc, startDateDesc }
+
+enum ActivityFilter { all, upcoming, ongoing, completed }
+
+final activitySortProvider = StateProvider<ActivitySort>((ref) {
+  return ActivitySort.startDateAsc;
+});
+
+final activityFilterProvider = StateProvider<ActivityFilter>((ref) {
+  return ActivityFilter.all;
+});
+
+ActivityStatus getActivityStatus(ActivityModel item, DateTime now) {
+  if (item.date == null) return ActivityStatus.upcoming;
+  final date = DateTime(item.date!.year, item.date!.month, item.date!.day);
+  final today = DateTime(now.year, now.month, now.day);
+
+  if (date.isAfter(today)) return ActivityStatus.upcoming;
+  if (date.isBefore(today)) return ActivityStatus.completed;
+  return ActivityStatus.ongoing;
+}
+
 final isLoadingProvider = StateProvider((ref) => false);
 
 class ActivitiesNotifier

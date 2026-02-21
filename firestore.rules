@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Trips Collection Rules
+    match /trips/{tripId} {
+      // Hanya user yang authenticated bisa akses
+      // User hanya bisa read trips milik mereka sendiri
+      allow read: if request.auth != null && 
+                     request.auth.uid == resource.data.userId;
+      
+      // User hanya bisa create trips dengan userId mereka sendiri
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll([
+                         'name', 'location', 'notes', 'category', 
+                         'userId', 'status', 'createdAt', 'updatedAt'
+                       ]);
+      
+      // User hanya bisa update trips milik mereka sendiri
+      // userId tidak boleh diubah
+      allow update: if request.auth != null && 
+                       request.auth.uid == resource.data.userId &&
+                       request.auth.uid == request.resource.data.userId;
+      
+      // User hanya bisa delete trips milik mereka sendiri
+      allow delete: if request.auth != null && 
+                       request.auth.uid == resource.data.userId;
+    }
+    
+    // Deny all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

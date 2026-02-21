@@ -1,46 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
 import 'data/services/hive_service.dart';
+import 'data/providers/theme_provider.dart';
+import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/trips/detail_screen.dart';
+import 'screens/itinerary/itinerary_screen.dart';
 import 'screens/itinerary/my_itinerary_screen.dart';
+import 'screens/search/search_screen.dart';
 import 'screens/messages/messages_screen.dart';
 import 'screens/profile/profile_screen.dart';
-import 'screens/search/search_screen.dart';
-import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize Hive (untuk backward compatibility)
   final hiveService = HiveService.instance;
   await hiveService.initialize();
-  runApp(const ProviderScope(child: MyApp()));
+
+  // Initialize SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const MyApp(),
+    ),
+  );
 }
 
-// 💎 Penggunaan `MaterialApp` dengan named routes sudah sesuai dengan requirement Mission 5. 
-// Struktur navigasinya jelas dan mudah dipahami! 🗺️✨
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: 'Wanderly',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       home: const SplashScreen(),
-      // 💎 Definisi rute di sini sangat rapi. Menggunakan nama route yang deskriptif 
-      // mempermudah tracking navigasi antar layar. Good job! 🎯
       routes: {
-        '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
-        '/itinerary': (context) => const MyItineraryScreen(),
+        '/detail': (context) => const DetailScreen(),
+        '/itinerary': (context) => const ItineraryScreen(),
         '/activities': (context) => const MyItineraryScreen(),
         '/search': (context) => const SearchScreen(),
         '/messages': (context) => const MessagesScreen(),

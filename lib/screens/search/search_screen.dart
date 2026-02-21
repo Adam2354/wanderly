@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   int _selectedIndex = 1;
   final TextEditingController _searchController = TextEditingController();
   List<String> searchResults = [];
@@ -99,8 +100,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final hintColor = isDark ? Colors.white60 : Colors.black38;
+    final cardColor = Theme.of(context).cardColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFB8E6F5),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -109,11 +120,15 @@ class _SearchScreenState extends State<SearchScreen> {
               child: TextField(
                 controller: _searchController,
                 onChanged: _performSearch,
+                style: TextStyle(color: textColor),
+                cursorColor: textColor,
+                keyboardAppearance: isDark ? Brightness.dark : Brightness.light,
                 decoration: InputDecoration(
                   hintText: 'Cari destinasi...',
-                  prefixIcon: const Icon(Icons.search),
+                  hintStyle: TextStyle(color: hintColor),
+                  prefixIcon: Icon(Icons.search, color: subTextColor),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: cardColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -131,10 +146,12 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.08),
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -143,11 +160,15 @@ class _SearchScreenState extends State<SearchScreen> {
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFF2F4BB9),
-          unselectedItemColor: Colors.black45,
+          unselectedItemColor:
+              Theme.of(context).iconTheme.color?.withOpacity(0.6) ??
+              (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white60
+                  : Colors.black45),
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Theme.of(context).cardColor,
           currentIndex: _selectedIndex,
           onTap: _onNavbarTapped,
           items: const [
@@ -165,18 +186,27 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchContent() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    // final cardColor = Theme.of(context).cardColor;
+
     if (_searchController.text.isEmpty) {
       return ListView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Trip Populer',
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 10),
@@ -214,11 +244,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     const SizedBox(height: 10),
                     Text(
                       _popularTrips[index]['name']!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                   ],
@@ -227,13 +257,13 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          const Text(
+          Text(
             'Rekomendasi Trip',
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 10),
@@ -253,18 +283,11 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.not_interested,
-              size: 64,
-              color: Colors.black.withOpacity(0.3),
-            ),
+            Icon(Icons.not_interested, size: 64, color: subTextColor),
             const SizedBox(height: 16),
             Text(
               'Tidak ada hasil pencarian',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black.withOpacity(0.5),
-              ),
+              style: TextStyle(fontSize: 16, color: subTextColor),
             ),
           ],
         ),
@@ -290,16 +313,27 @@ class _SearchScreenState extends State<SearchScreen> {
     required String location,
     required String image,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final cardColor = Theme.of(context).cardColor;
+
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/detail'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: isDark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
               spreadRadius: 1,
@@ -324,21 +358,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: Colors.black.withOpacity(0.6),
-                        ),
+                        Icon(Icons.location_on, size: 14, color: subTextColor),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -346,19 +376,19 @@ class _SearchScreenState extends State<SearchScreen> {
                             style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 12,
-                              color: Colors.black.withOpacity(0.6),
+                              color: subTextColor,
                             ),
                           ),
                         ),
                         const Icon(Icons.star, size: 14, color: Colors.orange),
                         const SizedBox(width: 2),
-                        const Text(
+                        Text(
                           '4.8',
                           style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                            color: textColor,
                           ),
                         ),
                       ],

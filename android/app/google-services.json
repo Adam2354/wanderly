@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "855506872428",
+    "project_id": "wanderly-8ab22",
+    "storage_bucket": "wanderly-8ab22.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855506872428:android:1cd0fd75d0640553045049",
+        "android_client_info": {
+          "package_name": "com.example.wanderly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855506872428-v66lu1ms5g2412e51uvuh49tjb2dpp12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVyJn0ydnyTc-DN12J88A9rMViECGCXWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855506872428-v66lu1ms5g2412e51uvuh49tjb2dpp12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
