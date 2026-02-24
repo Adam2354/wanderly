@@ -101,6 +101,7 @@ class ActivitiesByCategoryNotifier extends StateNotifier<List<ActivityModel>> {
     try {
       state = _hiveService.getActivitiesByCategory(_category);
     } catch (e) {
+      //{Inline Review: Hindari silent failure via print saja; pertimbangkan state error yang bisa ditampilkan di UI.}
       print('Error loading activities by category: $e');
       state = [];
     }

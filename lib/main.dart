@@ -51,6 +51,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  //{Inline Review: Dead/template widget sebaiknya dihapus agar codebase mission lebih bersih.}
   const MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
