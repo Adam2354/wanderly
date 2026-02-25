@@ -18,6 +18,7 @@ class HiveService {
 
   Future<void> initialize() async {
     await Hive.initFlutter();
+    //{Inline Review: Tambahkan guard `Hive.isAdapterRegistered` untuk mencegah duplicate adapter registration.}
     Hive.registerAdapter(ActivityModelAdapter());
     _box = await Hive.openBox<ActivityModel>(boxName);
     await _migrateImagePaths();

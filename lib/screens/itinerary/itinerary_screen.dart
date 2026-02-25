@@ -270,6 +270,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                         onPressed: selectedActivity != null
                             ? () {
                                 // Add activity using Riverpod provider
+                                //{Inline Review: Pembuatan entity dengan nilai hardcoded sebaiknya dipindah ke notifier/usecase.}
                                 final activity = ActivityModel(
                                   name: 'Kyoto Exploration',
                                   location: 'Kyoto, Japan',
