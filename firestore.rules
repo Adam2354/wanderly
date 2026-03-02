@@ -27,6 +27,31 @@ service cloud.firestore {
       allow delete: if request.auth != null && 
                        request.auth.uid == resource.data.userId;
     }
+
+    // Activities Collection Rules
+    match /activities/{activityId} {
+      // User hanya bisa baca activity milik mereka sendiri
+      allow read: if request.auth != null &&
+                     request.auth.uid == resource.data.userId;
+
+      // User hanya bisa create activity dengan userId mereka sendiri
+      allow create: if request.auth != null &&
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.keys().hasAll([
+                         'name', 'location', 'notes', 'category',
+                         'userId', 'createdAt', 'updatedAt'
+                       ]);
+
+      // User hanya bisa update activity milik mereka sendiri
+      // userId tidak boleh diubah
+      allow update: if request.auth != null &&
+                       request.auth.uid == resource.data.userId &&
+                       request.auth.uid == request.resource.data.userId;
+
+      // User hanya bisa delete activity milik mereka sendiri
+      allow delete: if request.auth != null &&
+                       request.auth.uid == resource.data.userId;
+    }
     
     // Deny all other collections by default
     match /{document=**} {

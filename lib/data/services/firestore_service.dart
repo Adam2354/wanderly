@@ -11,14 +11,15 @@ class FirestoreService {
 
   // Stream of trips for specific user
   Stream<List<TripModel>> getTripsStream(String userId) {
-    return _tripsCollection
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => TripModel.fromFirestore(doc)).toList(),
-        );
+    return _tripsCollection.where('userId', isEqualTo: userId).snapshots().map((
+      snapshot,
+    ) {
+      final trips = snapshot.docs
+          .map((doc) => TripModel.fromFirestore(doc))
+          .toList();
+      trips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return trips;
+    });
   }
 
   // Get all trips for user (one-time fetch)
@@ -26,11 +27,12 @@ class FirestoreService {
     try {
       final querySnapshot = await _tripsCollection
           .where('userId', isEqualTo: userId)
-          .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
+      final trips = querySnapshot.docs
           .map((doc) => TripModel.fromFirestore(doc))
           .toList();
+      trips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return trips;
     } catch (e) {
       throw Exception('Gagal mengambil data: $e');
     }
@@ -99,12 +101,13 @@ class FirestoreService {
     try {
       final querySnapshot = await _tripsCollection
           .where('userId', isEqualTo: userId)
-          .where('category', isEqualTo: category)
-          .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
+      final trips = querySnapshot.docs
           .map((doc) => TripModel.fromFirestore(doc))
+          .where((trip) => trip.category == category)
           .toList();
+      trips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return trips;
     } catch (e) {
       throw Exception('Gagal mengambil data berdasarkan kategori: $e');
     }
@@ -115,12 +118,13 @@ class FirestoreService {
     try {
       final querySnapshot = await _tripsCollection
           .where('userId', isEqualTo: userId)
-          .where('status', isEqualTo: status)
-          .orderBy('createdAt', descending: true)
           .get();
-      return querySnapshot.docs
+      final trips = querySnapshot.docs
           .map((doc) => TripModel.fromFirestore(doc))
+          .where((trip) => trip.status == status)
           .toList();
+      trips.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return trips;
     } catch (e) {
       throw Exception('Gagal mengambil data berdasarkan status: $e');
     }

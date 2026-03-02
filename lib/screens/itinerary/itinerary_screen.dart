@@ -47,8 +47,19 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+    final subTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ??
+        (isDark ? Colors.white70 : Colors.black54);
+    final cardColor = Theme.of(context).cardColor;
+    final shadowColor = Colors.black.withOpacity(isDark ? 0.35 : 0.08);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFDBF7FF),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -64,11 +75,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardColor,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: shadowColor,
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -76,7 +87,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                       ),
                       child: IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back, size: 24),
+                        icon: Icon(
+                          Icons.arrow_back,
+                          size: 24,
+                          color: textColor,
+                        ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(
                           minWidth: 44,
@@ -85,13 +100,13 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'Kyoto Exploration',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: textColor,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -109,12 +124,12 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Pick up a date!',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -127,11 +142,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             height: 48,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: cardColor,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: shadowColor,
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -141,7 +156,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                               value: selectedDay,
                               underline: const SizedBox(),
                               isExpanded: true,
-                              icon: const Icon(Icons.expand_more),
+                              icon: Icon(Icons.expand_more, color: textColor),
+                              dropdownColor: cardColor,
+                              style: TextStyle(color: textColor),
                               items:
                                   List.generate(31, (i) => (i + 1).toString())
                                       .map(
@@ -171,11 +188,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             height: 48,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: cardColor,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: shadowColor,
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -185,7 +202,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                               value: selectedMonth,
                               underline: const SizedBox(),
                               isExpanded: true,
-                              icon: const Icon(Icons.expand_more),
+                              icon: Icon(Icons.expand_more, color: textColor),
+                              dropdownColor: cardColor,
+                              style: TextStyle(color: textColor),
                               items:
                                   [
                                         'Jan',
@@ -226,11 +245,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             height: 48,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: cardColor,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.06),
+                                  color: shadowColor,
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -240,7 +259,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                               value: selectedYear,
                               underline: const SizedBox(),
                               isExpanded: true,
-                              icon: const Icon(Icons.expand_more),
+                              icon: Icon(Icons.expand_more, color: textColor),
+                              dropdownColor: cardColor,
+                              style: TextStyle(color: textColor),
                               items: ['2024', '2025', '2026', '2027']
                                   .map(
                                     (year) => DropdownMenuItem(
@@ -284,7 +305,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                                   context: context,
                                   barrierDismissible: true,
                                   builder: (context) => Dialog(
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: cardColor,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -302,12 +323,12 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                                             size: 56,
                                           ),
                                           const SizedBox(height: 16),
-                                          const Text(
+                                          Text(
                                             'Berhasil ditambahkan!',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black,
+                                              color: textColor,
                                             ),
                                           ),
                                           const SizedBox(height: 16),
@@ -328,10 +349,10 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                                                 );
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                  0xFF2F4BB9,
-                                                ),
-                                                foregroundColor: Colors.white,
+                                                backgroundColor:
+                                                    colorScheme.primary,
+                                                foregroundColor:
+                                                    colorScheme.onPrimary,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(12),
@@ -357,11 +378,11 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: selectedActivity != null
-                              ? const Color(0xFF2F4BB9)
-                              : Colors.grey[300],
+                              ? colorScheme.primary
+                              : Theme.of(context).disabledColor,
                           foregroundColor: selectedActivity != null
-                              ? Colors.white
-                              : Colors.grey[600],
+                              ? colorScheme.onPrimary
+                              : subTextColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -389,21 +410,21 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Add to Itinerary',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Add Activities',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: subTextColor,
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -481,10 +502,10 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: shadowColor,
               blurRadius: 8,
               offset: const Offset(0, -2),
             ),
@@ -492,8 +513,8 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF2F4BB9),
-          unselectedItemColor: Colors.black45,
+          selectedItemColor: colorScheme.primary,
+          unselectedItemColor: subTextColor,
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 0,
@@ -528,13 +549,20 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final cardColor = Theme.of(context).cardColor;
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ??
+        (isDark ? Colors.white : Colors.black);
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: 1,
@@ -549,15 +577,15 @@ class _ActivityCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 56, color: const Color(0xFF2F4BB9)),
+              Icon(icon, size: 56, color: colorScheme.primary),
               const SizedBox(height: 16),
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: textColor,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,

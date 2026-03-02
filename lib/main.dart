@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-import 'data/services/hive_service.dart';
 import 'data/providers/theme_provider.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -21,10 +20,6 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Initialize Hive (untuk backward compatibility)
-  final hiveService = HiveService.instance;
-  await hiveService.initialize();
 
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();

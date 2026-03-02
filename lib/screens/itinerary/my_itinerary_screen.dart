@@ -362,18 +362,11 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                               );
 
                               if (existing != null) {
-                                ref.read(activitiesProvider).whenData((
-                                  allActivities,
-                                ) {
-                                  final globalIndex = allActivities.indexOf(
-                                    existing,
-                                  );
-                                  if (globalIndex != -1) {
-                                    ref
-                                        .read(activitiesProvider.notifier)
-                                        .updateActivity(globalIndex, activity);
-                                  }
-                                });
+                                if (existing.id != null) {
+                                  ref
+                                      .read(activitiesProvider.notifier)
+                                      .updateActivity(existing.id!, activity);
+                                }
                               } else {
                                 ref
                                     .read(activitiesProvider.notifier)
@@ -414,14 +407,9 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
           ),
           TextButton(
             onPressed: () {
-              ref.read(activitiesProvider).whenData((allActivities) {
-                final indexInAll = allActivities.indexOf(item);
-                if (indexInAll != -1) {
-                  ref
-                      .read(activitiesProvider.notifier)
-                      .deleteActivity(indexInAll);
-                }
-              });
+              if (item.id != null) {
+                ref.read(activitiesProvider.notifier).deleteActivity(item.id!);
+              }
               Navigator.pop(context);
             },
             child: const Text('Hapus', style: TextStyle(color: Colors.red)),

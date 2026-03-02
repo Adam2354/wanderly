@@ -114,14 +114,11 @@ class _ActivityDetailScreenState extends ConsumerState<ActivityDetailScreen> {
   Future<void> _updateStatus(ActivityStatus status) async {
     final updated = _activity.copyWith(date: _dateForStatus(status));
 
-    ref.read(activitiesProvider).whenData((allActivities) {
-      final index = allActivities.indexWhere(
-        (item) => item.key == _activity.key,
-      );
-      if (index != -1) {
-        ref.read(activitiesProvider.notifier).updateActivity(index, updated);
-      }
-    });
+    if (_activity.id != null) {
+      await ref
+          .read(activitiesProvider.notifier)
+          .updateActivity(_activity.id!, updated);
+    }
 
     setState(() {
       _activity = updated;

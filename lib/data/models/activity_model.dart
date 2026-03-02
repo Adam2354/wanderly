@@ -1,28 +1,24 @@
-import 'package:hive/hive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-part 'activity_model.g.dart';
+class ActivityModel {
+  final String? id;
+  final String userId;
 
-@HiveType(typeId: 0)
-class ActivityModel extends HiveObject {
-  @HiveField(0)
   late String name;
 
-  @HiveField(1)
   late String location;
 
-  @HiveField(2)
   late String notes;
 
-  @HiveField(3)
   late DateTime? date;
 
-  @HiveField(4)
   late String? imagePath;
 
-  @HiveField(5)
   late String category;
 
   ActivityModel({
+    this.id,
+    this.userId = '',
     required this.name,
     required this.location,
     required this.notes,
@@ -31,16 +27,59 @@ class ActivityModel extends HiveObject {
     this.imagePath,
   });
 
-  ActivityModel.empty() {
-    name = '';
-    location = '';
-    notes = '';
-    category = '';
-    date = null;
-    imagePath = null;
+  ActivityModel.empty()
+    : id = null,
+      userId = '',
+      name = '',
+      location = '',
+      notes = '',
+      category = '',
+      date = null,
+      imagePath = null;
+
+  factory ActivityModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return ActivityModel(
+      id: doc.id,
+      userId: data['userId'] ?? '',
+      name: data['name'] ?? '',
+      location: data['location'] ?? '',
+      notes: data['notes'] ?? '',
+      category: data['category'] ?? '',
+      date: data['date'] != null ? (data['date'] as Timestamp).toDate() : null,
+      imagePath: data['imagePath'],
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'name': name,
+      'location': location,
+      'notes': notes,
+      'category': category,
+      'date': date != null ? Timestamp.fromDate(date!) : null,
+      'imagePath': imagePath,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+  }
+
+  Map<String, dynamic> toFirestoreUpdate() {
+    return {
+      'name': name,
+      'location': location,
+      'notes': notes,
+      'category': category,
+      'date': date != null ? Timestamp.fromDate(date!) : null,
+      'imagePath': imagePath,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
   }
 
   ActivityModel copyWith({
+    String? id,
+    String? userId,
     String? name,
     String? location,
     String? notes,
@@ -49,6 +88,8 @@ class ActivityModel extends HiveObject {
     String? category,
   }) {
     return ActivityModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       location: location ?? this.location,
       notes: notes ?? this.notes,

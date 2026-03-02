@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../data/services/hive_service.dart';
 import '../../data/providers/theme_provider.dart';
 import '../../data/providers/auth_provider.dart';
+import '../../data/providers/trip_provider.dart';
+import '../../data/providers/activity_provider.dart';
+import '../trips/my_trips_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -37,6 +38,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
+    final tripStats = ref.watch(tripStatsProvider);
+    final completedTripCount = tripStats['completed'] ?? 0;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final email = user?.email ?? 'wisatawan@wanderly.com';
     final fallbackName = email.contains('@')
@@ -158,13 +161,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.bookmark_outline,
                       title: 'Wisata Tersimpan',
                       subtitle: '12 destinasi tersimpan',
+                      onTap: () {
+                        Navigator.pushNamed(context, '/activities');
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildMenuOption(
                       context,
                       icon: Icons.check_circle_outline,
                       title: 'Perjalanan Selesai',
-                      subtitle: '8 perjalanan terpenuhi',
+                      subtitle: '$completedTripCount perjalanan terpenuhi',
+                      onTap: () {
+                        ref.read(tripFilterStatusProvider.notifier).state =
+                            TripFilterStatus.completed;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyTripsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildMenuOption(
@@ -172,6 +188,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.star_outline,
                       title: 'Rating & Ulasan',
                       subtitle: 'Lihat ulasan Anda',
+                      onTap: () {
+                        ref.read(activityFilterProvider.notifier).state =
+                            ActivityFilter.completed;
+                        Navigator.pushNamed(context, '/activities');
+                      },
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -231,7 +252,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         onChanged: (value) {
                           ref.read(themeModeProvider.notifier).toggleTheme();
                         },
-                        activeColor: const Color(0xFF2F4BB9),
+                        activeThumbColor: const Color(0xFF2F4BB9),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -252,165 +273,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark
-                            ? Colors.black.withOpacity(0.4)
-                            : const Color(0xFF2F4BB9).withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        final confirmed = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            insetPadding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 24,
-                            ),
-                            titlePadding: const EdgeInsets.fromLTRB(
-                              20,
-                              20,
-                              20,
-                              8,
-                            ),
-                            contentPadding: const EdgeInsets.fromLTRB(
-                              20,
-                              0,
-                              20,
-                              16,
-                            ),
-                            actionsPadding: const EdgeInsets.fromLTRB(
-                              16,
-                              0,
-                              16,
-                              16,
-                            ),
-                            title: const Text(
-                              'Reset Data',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            content: const Text(
-                              'Ini akan menghapus semua data dan reload sample Kyoto Exploration. Lanjutkan?',
-                              style: TextStyle(fontSize: 14, height: 1.4),
-                            ),
-                            actions: [
-                              SizedBox(
-                                height: 46,
-                                child: TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.black54,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 10,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: const Text('Batal'),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 46,
-                                child: ElevatedButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2F4BB9),
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 10,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: const Text('Reset'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-
-                        if (confirmed == true && mounted) {
-                          try {
-                            await HiveService.instance.reloadSampleData();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    '✓ Sample data berhasil di-reload (14 items)',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  duration: Duration(seconds: 3),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF2F4BB9),
-                        side: const BorderSide(
-                          color: Color(0xFF2F4BB9),
-                          width: 2,
-                        ),
-                        backgroundColor: Theme.of(context).cardColor,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.refresh, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Reload Sample Data',
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -607,6 +469,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required IconData icon,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
     final titleColor =
         Theme.of(context).textTheme.titleMedium?.color ?? Colors.black87;
@@ -615,67 +478,74 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final trailingColor =
         Theme.of(context).iconTheme.color?.withOpacity(0.6) ?? Colors.black45;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF2F4BB9).withOpacity(0.15),
-                  const Color(0xFF2F4BB9).withOpacity(0.08),
-                ],
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
               ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: const Color(0xFF2F4BB9), size: 24),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Urbanist',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                    color: titleColor,
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF2F4BB9).withOpacity(0.15),
+                      const Color(0xFF2F4BB9).withOpacity(0.08),
+                    ],
                   ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 12,
-                    color: subtitleColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Icon(icon, color: const Color(0xFF2F4BB9), size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 12,
+                        color: subtitleColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 18, color: trailingColor),
+            ],
           ),
-          Icon(Icons.arrow_forward_ios, size: 18, color: trailingColor),
-        ],
+        ),
       ),
     );
   }

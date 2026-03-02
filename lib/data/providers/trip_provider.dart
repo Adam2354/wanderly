@@ -1,12 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/trip_model.dart';
-import '../services/firestore_service.dart';
-import '../services/firebase_auth_service.dart';
+import 'dart:convert';
 
-// Firestore Service Provider
-final firestoreServiceProvider = Provider<FirestoreService>((ref) {
-  return FirestoreService();
-});
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/trip_model.dart';
+import 'theme_provider.dart';
 
 // Filter Status Provider
 enum TripFilterStatus { all, upcoming, ongoing, completed }
@@ -22,100 +19,261 @@ final tripSortByProvider = StateProvider<TripSortBy>((ref) {
   return TripSortBy.dateDesc;
 });
 
-// Trips Stream Provider (dari Firestore)
-final tripsStreamProvider = StreamProvider<List<TripModel>>((ref) {
-  final firestoreService = ref.watch(firestoreServiceProvider);
-  final authService = FirebaseAuthService();
-  final userId = authService.currentUserId;
+final localTripsProvider =
+    StateNotifierProvider<LocalTripsNotifier, List<TripModel>>(
+      (ref) => LocalTripsNotifier(ref.watch(sharedPreferencesProvider)),
+    );
 
-  if (userId == null) {
-    return Stream.value([]);
-  }
-
-  return firestoreService.getTripsStream(userId);
+final tripsStreamProvider = Provider<List<TripModel>>((ref) {
+  return ref.watch(localTripsProvider);
 });
 
 // Filtered and Sorted Trips Provider
 final filteredSortedTripsProvider = Provider<List<TripModel>>((ref) {
-  final tripsAsync = ref.watch(tripsStreamProvider);
+  final trips = ref.watch(tripsStreamProvider);
   final filterStatus = ref.watch(tripFilterStatusProvider);
   final sortBy = ref.watch(tripSortByProvider);
 
-  return tripsAsync.when(
-    data: (trips) {
-      // Update auto status based on dates
-      final updatedTrips = trips.map((trip) {
-        final autoStatus = trip.getAutoStatus();
-        if (autoStatus != trip.status) {
-          // Update status di Firestore jika berbeda
-          final firestoreService = ref.read(firestoreServiceProvider);
-          if (trip.id != null) {
-            firestoreService.updateTripStatus(trip.id!, autoStatus);
-          }
-          return trip.copyWith(status: autoStatus);
-        }
-        return trip;
-      }).toList();
+  final computedTrips = trips
+      .map((trip) => trip.copyWith(status: trip.getAutoStatus()))
+      .toList();
 
-      // Filter berdasarkan status
-      List<TripModel> filtered = updatedTrips;
-      if (filterStatus != TripFilterStatus.all) {
-        filtered = updatedTrips.where((trip) {
-          switch (filterStatus) {
-            case TripFilterStatus.upcoming:
-              return trip.status == 'upcoming';
-            case TripFilterStatus.ongoing:
-              return trip.status == 'ongoing';
-            case TripFilterStatus.completed:
-              return trip.status == 'completed';
-            default:
-              return true;
-          }
-        }).toList();
+  List<TripModel> filtered = computedTrips;
+  if (filterStatus != TripFilterStatus.all) {
+    filtered = computedTrips.where((trip) {
+      switch (filterStatus) {
+        case TripFilterStatus.upcoming:
+          return trip.status == 'upcoming';
+        case TripFilterStatus.ongoing:
+          return trip.status == 'ongoing';
+        case TripFilterStatus.completed:
+          return trip.status == 'completed';
+        case TripFilterStatus.all:
+          return true;
+      }
+    }).toList();
+  }
+
+  filtered.sort((a, b) {
+    switch (sortBy) {
+      case TripSortBy.dateAsc:
+        if (a.startDate == null && b.startDate == null) return 0;
+        if (a.startDate == null) return 1;
+        if (b.startDate == null) return -1;
+        return a.startDate!.compareTo(b.startDate!);
+      case TripSortBy.dateDesc:
+        if (a.startDate == null && b.startDate == null) return 0;
+        if (a.startDate == null) return 1;
+        if (b.startDate == null) return -1;
+        return b.startDate!.compareTo(a.startDate!);
+      case TripSortBy.nameAsc:
+        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      case TripSortBy.nameDesc:
+        return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+    }
+  });
+
+  return filtered;
+});
+
+class LocalTripsNotifier extends StateNotifier<List<TripModel>> {
+  LocalTripsNotifier(this._prefs) : super([]) {
+    _loadFromPrefs();
+  }
+
+  final SharedPreferences _prefs;
+  static const String _storageKey = 'local_trips_v1';
+
+  static List<TripModel> _seedTrips() {
+    return [
+      TripModel(
+        id: 'local-trip-1',
+        name: 'Kyoto Exploration',
+        location: 'Kyoto, Japan',
+        notes: 'Trip budaya dan kuliner Kyoto',
+        category: 'Sightseeing',
+        userId: 'local-user',
+        startDate: DateTime(2026, 3, 15),
+        endDate: DateTime(2026, 3, 20),
+        status: 'upcoming',
+      ),
+      TripModel(
+        id: 'local-trip-2',
+        name: 'Osaka Food Tour',
+        location: 'Osaka, Japan',
+        notes: 'Jelajah street food Osaka',
+        category: 'Restaurant',
+        userId: 'local-user',
+        startDate: DateTime(2026, 2, 10),
+        endDate: DateTime(2026, 2, 14),
+        status: 'completed',
+      ),
+      TripModel(
+        id: 'local-trip-3',
+        name: 'Tokyo City Lights',
+        location: 'Tokyo, Japan',
+        notes: 'Wisata kota modern dan nightlife',
+        category: 'Nightlife',
+        userId: 'local-user',
+        startDate: DateTime.now().subtract(const Duration(days: 1)),
+        endDate: DateTime.now().add(const Duration(days: 2)),
+        status: 'ongoing',
+      ),
+    ];
+  }
+
+  Future<void> _loadFromPrefs() async {
+    final raw = _prefs.getString(_storageKey);
+
+    if (raw == null || raw.isEmpty) {
+      state = _seedTrips();
+      await _persist();
+      return;
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) {
+        state = _seedTrips();
+        await _persist();
+        return;
       }
 
-      // Sort berdasarkan pilihan
-      filtered.sort((a, b) {
-        switch (sortBy) {
-          case TripSortBy.dateAsc:
-            if (a.startDate == null && b.startDate == null) return 0;
-            if (a.startDate == null) return 1;
-            if (b.startDate == null) return -1;
-            return a.startDate!.compareTo(b.startDate!);
+      final trips = decoded
+          .whereType<Map>()
+          .map((entry) => _fromLocalMap(Map<String, dynamic>.from(entry)))
+          .toList();
 
-          case TripSortBy.dateDesc:
-            if (a.startDate == null && b.startDate == null) return 0;
-            if (a.startDate == null) return 1;
-            if (b.startDate == null) return -1;
-            return b.startDate!.compareTo(a.startDate!);
+      if (trips.isEmpty) {
+        state = _seedTrips();
+        await _persist();
+        return;
+      }
 
-          case TripSortBy.nameAsc:
-            return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      state = trips;
+    } catch (_) {
+      state = _seedTrips();
+      await _persist();
+    }
+  }
 
-          case TripSortBy.nameDesc:
-            return b.name.toLowerCase().compareTo(a.name.toLowerCase());
-        }
-      });
+  TripModel _fromLocalMap(Map<String, dynamic> map) {
+    return TripModel(
+      id: map['id'] as String?,
+      name: (map['name'] as String?) ?? '',
+      location: (map['location'] as String?) ?? '',
+      notes: (map['notes'] as String?) ?? '',
+      category: (map['category'] as String?) ?? 'Sightseeing',
+      userId: (map['userId'] as String?) ?? 'local-user',
+      startDate: map['startDate'] != null
+          ? DateTime.tryParse(map['startDate'] as String)
+          : null,
+      endDate: map['endDate'] != null
+          ? DateTime.tryParse(map['endDate'] as String)
+          : null,
+      imagePath: map['imagePath'] as String?,
+      status: (map['status'] as String?) ?? 'upcoming',
+      createdAt: map['createdAt'] != null
+          ? (DateTime.tryParse(map['createdAt'] as String) ?? DateTime.now())
+          : DateTime.now(),
+      updatedAt: map['updatedAt'] != null
+          ? (DateTime.tryParse(map['updatedAt'] as String) ?? DateTime.now())
+          : DateTime.now(),
+    );
+  }
 
-      return filtered;
-    },
-    loading: () => [],
-    error: (_, __) => [],
-  );
-});
+  Map<String, dynamic> _toLocalMap(TripModel trip) {
+    return {
+      'id': trip.id,
+      'name': trip.name,
+      'location': trip.location,
+      'notes': trip.notes,
+      'category': trip.category,
+      'userId': trip.userId,
+      'startDate': trip.startDate?.toIso8601String(),
+      'endDate': trip.endDate?.toIso8601String(),
+      'imagePath': trip.imagePath,
+      'status': trip.status,
+      'createdAt': trip.createdAt.toIso8601String(),
+      'updatedAt': trip.updatedAt.toIso8601String(),
+    };
+  }
+
+  Future<void> _persist() async {
+    final payload = state.map(_toLocalMap).toList();
+    await _prefs.setString(_storageKey, jsonEncode(payload));
+  }
+
+  int _nextTripNumber() {
+    final localIds = state
+        .map((trip) => trip.id ?? '')
+        .where((id) => id.startsWith('local-trip-'))
+        .toList();
+
+    if (localIds.isEmpty) {
+      return 1;
+    }
+
+    final numbers =
+        localIds
+            .map((id) => int.tryParse(id.replaceFirst('local-trip-', '')) ?? 0)
+            .toList()
+          ..sort();
+
+    return numbers.last + 1;
+  }
+
+  Future<void> addTrip(TripModel trip) async {
+    final id = 'local-trip-${_nextTripNumber()}';
+    state = [
+      ...state,
+      trip.copyWith(
+        id: id,
+        userId: trip.userId.isEmpty ? 'local-user' : trip.userId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    ];
+    await _persist();
+  }
+
+  Future<void> updateTrip(String tripId, TripModel trip) async {
+    state = state.map((item) {
+      if (item.id != tripId) return item;
+      return trip.copyWith(
+        id: item.id,
+        userId: item.userId,
+        createdAt: item.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    }).toList();
+    await _persist();
+  }
+
+  Future<void> deleteTrip(String tripId) async {
+    state = state.where((item) => item.id != tripId).toList();
+    await _persist();
+  }
+
+  Future<void> updateTripStatus(String tripId, String status) async {
+    state = state.map((item) {
+      if (item.id != tripId) return item;
+      return item.copyWith(status: status, updatedAt: DateTime.now());
+    }).toList();
+    await _persist();
+  }
+}
 
 // Trip Notifier untuk CRUD operations
 class TripNotifier extends StateNotifier<AsyncValue<void>> {
-  final FirestoreService _firestoreService;
-  final String _userId;
+  final LocalTripsNotifier _localTripsNotifier;
 
-  TripNotifier(this._firestoreService, this._userId)
-    : super(const AsyncValue.data(null));
+  TripNotifier(this._localTripsNotifier) : super(const AsyncValue.data(null));
 
   Future<void> addTrip(TripModel trip) async {
     state = const AsyncValue.loading();
     try {
-      await _firestoreService.addTrip(trip.copyWith(userId: _userId));
+      await _localTripsNotifier.addTrip(trip);
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -125,7 +283,7 @@ class TripNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> updateTrip(String tripId, TripModel trip) async {
     state = const AsyncValue.loading();
     try {
-      await _firestoreService.updateTrip(tripId, trip);
+      await _localTripsNotifier.updateTrip(tripId, trip);
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -135,7 +293,7 @@ class TripNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> deleteTrip(String tripId) async {
     state = const AsyncValue.loading();
     try {
-      await _firestoreService.deleteTrip(tripId);
+      await _localTripsNotifier.deleteTrip(tripId);
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -145,7 +303,7 @@ class TripNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> updateTripStatus(String tripId, String status) async {
     state = const AsyncValue.loading();
     try {
-      await _firestoreService.updateTripStatus(tripId, status);
+      await _localTripsNotifier.updateTripStatus(tripId, status);
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -156,10 +314,8 @@ class TripNotifier extends StateNotifier<AsyncValue<void>> {
 // Trip Notifier Provider
 final tripNotifierProvider =
     StateNotifierProvider<TripNotifier, AsyncValue<void>>((ref) {
-      final firestoreService = ref.watch(firestoreServiceProvider);
-      final authService = FirebaseAuthService();
-      final userId = authService.currentUserId ?? '';
-      return TripNotifier(firestoreService, userId);
+      final localTripsNotifier = ref.read(localTripsProvider.notifier);
+      return TripNotifier(localTripsNotifier);
     });
 
 // Categories Provider
