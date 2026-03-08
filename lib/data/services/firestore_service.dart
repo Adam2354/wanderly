@@ -145,4 +145,61 @@ class FirestoreService {
       throw Exception('Gagal menghapus semua trip: $e');
     }
   }
+
+  Future<void> seedSampleTripsIfEmpty(String userId) async {
+    final existing = await _tripsCollection
+        .where('userId', isEqualTo: userId)
+        .limit(1)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      return;
+    }
+
+    final samples = <TripModel>[
+      TripModel(
+        name: 'Kyoto Exploration',
+        location: 'Kyoto, Japan',
+        notes: 'Perjalanan budaya dan kuliner di Kyoto',
+        category: 'Sightseeing',
+        userId: userId,
+        startDate: DateTime.now().add(const Duration(days: 7)),
+        endDate: DateTime.now().add(const Duration(days: 12)),
+        status: 'upcoming',
+        latitude: 35.0116,
+        longitude: 135.7681,
+      ),
+      TripModel(
+        name: 'Osaka Food Tour',
+        location: 'Osaka, Japan',
+        notes: 'Jelajah street food Osaka',
+        category: 'Restaurant',
+        userId: userId,
+        startDate: DateTime.now().subtract(const Duration(days: 14)),
+        endDate: DateTime.now().subtract(const Duration(days: 10)),
+        status: 'completed',
+        latitude: 34.6937,
+        longitude: 135.5023,
+      ),
+      TripModel(
+        name: 'Tokyo City Lights',
+        location: 'Tokyo, Japan',
+        notes: 'City trip dan nightlife Tokyo',
+        category: 'Nightlife',
+        userId: userId,
+        startDate: DateTime.now().subtract(const Duration(days: 1)),
+        endDate: DateTime.now().add(const Duration(days: 2)),
+        status: 'ongoing',
+        latitude: 35.6762,
+        longitude: 139.6503,
+      ),
+    ];
+
+    final batch = _firestore.batch();
+    for (final trip in samples) {
+      final docRef = _tripsCollection.doc();
+      batch.set(docRef, trip.toFirestore());
+    }
+    await batch.commit();
+  }
 }

@@ -13,6 +13,8 @@ class TripModel {
   final String status; // upcoming, ongoing, completed
   final DateTime createdAt;
   final DateTime updatedAt;
+  final double? latitude;
+  final double? longitude;
 
   TripModel({
     this.id,
@@ -27,6 +29,8 @@ class TripModel {
     this.status = 'upcoming',
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.latitude,
+    this.longitude,
   }) : createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
@@ -54,6 +58,8 @@ class TripModel {
       updatedAt: data['updatedAt'] != null
           ? (data['updatedAt'] as Timestamp).toDate()
           : DateTime.now(),
+      latitude: (data['latitude'] as num?)?.toDouble(),
+      longitude: (data['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -71,6 +77,8 @@ class TripModel {
       'status': status,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 
@@ -88,6 +96,8 @@ class TripModel {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    double? latitude,
+    double? longitude,
   }) {
     return TripModel(
       id: id ?? this.id,
@@ -102,6 +112,8 @@ class TripModel {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 

@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Provider untuk SharedPreferences
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences not initialized');
 });
 
-// Theme Mode Notifier
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   final SharedPreferences _prefs;
   static const String _key = 'theme_mode';
@@ -35,7 +33,6 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   bool get isDarkMode => state == ThemeMode.dark;
 }
 
-// Theme Mode Provider
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
   ref,
 ) {
@@ -43,9 +40,7 @@ final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((
   return ThemeModeNotifier(prefs);
 });
 
-// App Theme Data
 class AppTheme {
-  // Light Theme
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -53,7 +48,7 @@ class AppTheme {
       seedColor: Colors.blue,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: const Color(0xFFB8E6F5), // Sky blue
+    scaffoldBackgroundColor: const Color(0xFFB8E6F5),
     cardTheme: const CardThemeData(
       color: Colors.white,
       elevation: 2,
@@ -62,7 +57,7 @@ class AppTheme {
       ),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFB8E6F5), // Sky blue
+      backgroundColor: Color(0xFFB8E6F5),
       foregroundColor: Colors.black,
       elevation: 0,
       centerTitle: true,
@@ -129,7 +124,6 @@ class AppTheme {
     ),
   );
 
-  // Dark Theme
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,

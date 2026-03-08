@@ -96,6 +96,21 @@ include(":app")
    flutter build apk
    ```
 
+5. **Tambahkan API key Google Maps (tanpa hardcode di source code)**
+
+        Pilih salah satu cara berikut:
+
+        - **Direkomendasikan (local machine):** tambah di `android/local.properties`
+
+            ```properties
+            MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+            ```
+
+        - **Alternatif CI/CD:** set environment variable `MAPS_API_KEY`
+        - **Alternatif global Gradle:** tambah di `~/.gradle/gradle.properties`
+
+        Prioritas pembacaan key: `-PMAPS_API_KEY` (Gradle property) → `android/local.properties` → environment variable `MAPS_API_KEY`.
+
 ## Verifikasi
 
 Jika setup benar:

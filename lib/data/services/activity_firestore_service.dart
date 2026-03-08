@@ -9,6 +9,24 @@ class ActivityFirestoreService {
   CollectionReference get _activitiesCollection =>
       _firestore.collection(collectionName);
 
+  static const Map<String, List<double>> _locationCoordinates = {
+    'kyoto, japan': [35.0116, 135.7681],
+    'kyoto station': [34.9855, 135.7584],
+    'nishiki market': [35.0050, 135.7640],
+    'sanjo teramachi': [35.0087, 135.7688],
+    'gion, kyoto': [35.0037, 135.7788],
+    'pontocho alley': [35.0074, 135.7706],
+    'higashiyama ward': [34.9978, 135.7850],
+    'kyoto station area': [34.9858, 135.7580],
+    'nakagyo ward': [35.0100, 135.7510],
+    'downtown kyoto': [35.0056, 135.7681],
+    'nijo castle area': [35.0142, 135.7481],
+  };
+
+  List<double>? _resolveCoordinates(String location) {
+    return _locationCoordinates[location.toLowerCase().trim()];
+  }
+
   Stream<List<ActivityModel>> getActivitiesStream(String userId) {
     return _activitiesCollection
         .where('userId', isEqualTo: userId)
@@ -69,6 +87,8 @@ class ActivityFirestoreService {
           category: category,
           date: item.date,
           imagePath: item.imagePath,
+          latitude: _resolveCoordinates(item.location)?[0],
+          longitude: _resolveCoordinates(item.location)?[1],
         );
         batch.set(docRef, model.toFirestore());
       }

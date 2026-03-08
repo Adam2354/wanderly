@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/activity_model.dart';
-import '../../data/providers/activity_provider.dart';
+import '../../presentation/providers/activity_provider.dart';
 import 'my_itinerary_screen.dart';
 
 // 💎 `ItineraryScreen` menggunakan `DropdownButton` untuk pemilihan tanggal
@@ -286,7 +286,6 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                     const SizedBox(height: 14),
                     SizedBox(
                       width: double.infinity,
-                      height: 48,
                       child: ElevatedButton(
                         onPressed: selectedActivity != null
                             ? () {
@@ -383,6 +382,8 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                           foregroundColor: selectedActivity != null
                               ? colorScheme.onPrimary
                               : subTextColor,
+                          minimumSize: const Size(double.infinity, 52),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -391,7 +392,8 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                         child: const Text(
                           'Book Now',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
+                            height: 1.2,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

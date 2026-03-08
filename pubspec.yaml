@@ -45,6 +45,8 @@ dependencies:
   shared_preferences: ^2.3.4
   intl: ^0.19.0
   image_picker: ^1.1.2
+  google_maps_flutter: ^2.12.3
+  url_launcher: ^6.3.1
 
 # 🚩 Catatan: Dependency sangat minimalist. Memang cukup, tapi eksplorasi package
 # seperti `google_fonts` bisa bikin UI-mu makin 'stand out'! 📦💡
@@ -53,6 +55,9 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^5.0.0
+
+dependency_overrides:
+  shared_preferences_android: 2.3.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

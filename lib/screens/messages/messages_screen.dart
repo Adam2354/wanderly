@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../trips/detail_screen.dart';
+import '../../presentation/screens/trips/detail_screen.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});

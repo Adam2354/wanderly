@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-import 'data/providers/theme_provider.dart';
+import 'presentation/providers/theme_provider.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/trips/detail_screen.dart';
+import 'presentation/screens/trips/detail_screen.dart';
+import 'presentation/screens/trips/trip_map_screen.dart';
 import 'screens/itinerary/itinerary_screen.dart';
 import 'screens/itinerary/my_itinerary_screen.dart';
 import 'screens/search/search_screen.dart';
@@ -51,6 +52,7 @@ class MyApp extends ConsumerWidget {
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
         '/detail': (context) => const DetailScreen(),
+        '/trip-map': (context) => const TripMapScreen(),
         '/itinerary': (context) => const ItineraryScreen(),
         '/activities': (context) => const MyItineraryScreen(),
         '/search': (context) => const SearchScreen(),

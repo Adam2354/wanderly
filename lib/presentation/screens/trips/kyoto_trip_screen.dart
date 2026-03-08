@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/providers/activity_provider.dart';
+import '../../providers/activity_provider.dart';
 import 'detail_screen.dart';
 
 // 💎 `KyotoTripScreen` dengan visualisasi list destinasi yang bersih dan
@@ -119,31 +119,25 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2F4BB9),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: IconButton(
+                    SizedBox(
+                      height: 44,
+                      child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.pushNamed(context, '/activities');
                         },
-                        icon: const Icon(
-                          Icons.list,
-                          size: 24,
-                          color: Colors.white,
+                        icon: const Icon(Icons.list, size: 18),
+                        label: const Text(
+                          'Itinerary',
+                          style: TextStyle(fontSize: 13),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(
-                          minWidth: 44,
-                          minHeight: 44,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2F4BB9),
+                          foregroundColor: Colors.white,
+                          elevation: 2,
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
@@ -187,7 +181,7 @@ class _KyotoTripScreenState extends ConsumerState<KyotoTripScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const DetailScreen(),
+                            builder: (_) => DetailScreen(activity: attraction),
                           ),
                         );
                       },

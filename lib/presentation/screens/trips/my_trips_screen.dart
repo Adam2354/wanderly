@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/trip_provider.dart';
-import '../../data/models/trip_model.dart';
-import '../../data/models/activity_model.dart';
-import '../../data/providers/activity_provider.dart';
+import '../../providers/trip_provider.dart';
+import '../../../data/models/trip_model.dart';
+import '../../../data/models/activity_model.dart';
+import '../../providers/activity_provider.dart' hide categoriesProvider;
 import 'package:intl/intl.dart';
 import 'activity_detail_screen.dart';
 
@@ -16,20 +16,11 @@ class MyTripsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final trips = ref.watch(filteredSortedTripsProvider);
     final filterStatus = ref.watch(tripFilterStatusProvider);
-    final sortBy = ref.watch(tripSortByProvider);
     final stats = ref.watch(tripStatsProvider);
     final activitiesAsync = ref.watch(activitiesProvider);
-
-    final allActivities = activitiesAsync.maybeWhen(
-      data: (items) => items,
-      orElse: () => const <ActivityModel>[],
-    );
-    final fallbackStats = _buildActivityStats(allActivities);
-    final fallbackActivities = _filterAndSortActivities(
-      allActivities,
-      filterStatus,
-      sortBy,
-    );
+    final fallbackData = ref.watch(tripFallbackDataProvider);
+    final fallbackStats = fallbackData.stats;
+    final fallbackActivities = fallbackData.activities;
 
     final hasTripData = trips.isNotEmpty;
     final totalCount = hasTripData ? stats['total']! : fallbackStats['total']!;
@@ -47,6 +38,13 @@ class MyTripsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('My Trips'),
         actions: [
+          IconButton(
+            tooltip: 'Trip Map',
+            onPressed: () {
+              Navigator.pushNamed(context, '/trip-map');
+            },
+            icon: const Icon(Icons.map_outlined),
+          ),
           // Filter button
           PopupMenuButton<TripFilterStatus>(
             icon: Icon(
@@ -124,19 +122,37 @@ class MyTripsScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatItem(context, 'Total', totalCount, Colors.blue),
-                _buildStatItem(
-                  context,
-                  'Upcoming',
-                  upcomingCount,
-                  Colors.orange,
+                Expanded(
+                  child: _buildStatItem(
+                    context,
+                    'Total',
+                    totalCount,
+                    Colors.blue,
+                  ),
                 ),
-                _buildStatItem(context, 'Ongoing', ongoingCount, Colors.green),
-                _buildStatItem(
-                  context,
-                  'Completed',
-                  completedCount,
-                  Colors.grey,
+                Expanded(
+                  child: _buildStatItem(
+                    context,
+                    'Upcoming',
+                    upcomingCount,
+                    Colors.orange,
+                  ),
+                ),
+                Expanded(
+                  child: _buildStatItem(
+                    context,
+                    'Ongoing',
+                    ongoingCount,
+                    Colors.green,
+                  ),
+                ),
+                Expanded(
+                  child: _buildStatItem(
+                    context,
+                    'Completed',
+                    completedCount,
+                    Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -160,10 +176,10 @@ class MyTripsScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     itemCount: trips.length,
                     itemBuilder: (context, index) {
-                      return _buildTripCard(context, trips[index]);
+                      return _buildTripCard(context, ref, trips[index]);
                     },
                   )
-                : activitiesAsync.isLoading && allActivities.isEmpty
+                : activitiesAsync.isLoading && fallbackActivities.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : fallbackActivities.isEmpty
                 ? Center(
@@ -203,8 +219,7 @@ class MyTripsScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Navigate to add trip screen
-          Navigator.pushNamed(context, '/add_trip');
+          _openTripFormDialog(context, ref);
         },
         icon: const Icon(Icons.add),
         label: const Text('Add Trip'),
@@ -219,6 +234,7 @@ class MyTripsScreen extends ConsumerWidget {
     Color color,
   ) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           count.toString(),
@@ -228,12 +244,18 @@ class MyTripsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }
 
-  Widget _buildTripCard(BuildContext context, TripModel trip) {
+  Widget _buildTripCard(BuildContext context, WidgetRef ref, TripModel trip) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     Color statusColor;
     IconData statusIcon;
@@ -260,8 +282,7 @@ class MyTripsScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () {
-          // Navigate to trip detail
-          Navigator.pushNamed(context, '/trip_detail', arguments: trip);
+          Navigator.pushNamed(context, '/detail');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -337,17 +358,23 @@ class MyTripsScreen extends ConsumerWidget {
                             color: Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            trip.endDate != null
-                                ? '${dateFormat.format(trip.startDate!)} - ${dateFormat.format(trip.endDate!)}'
-                                : dateFormat.format(trip.startDate!),
-                            style: Theme.of(context).textTheme.bodySmall,
+                          Expanded(
+                            child: Text(
+                              trip.endDate != null
+                                  ? '${dateFormat.format(trip.startDate!)} - ${dateFormat.format(trip.endDate!)}'
+                                  : dateFormat.format(trip.startDate!),
+                              style: Theme.of(context).textTheme.bodySmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
                     const SizedBox(height: 8),
                     // Status chip
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -374,7 +401,6 @@ class MyTripsScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
                         // Category chip
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -399,6 +425,52 @@ class MyTripsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              PopupMenuButton<String>(
+                tooltip: 'Trip Actions',
+                onSelected: (value) {
+                  switch (value) {
+                    case 'edit':
+                      _openTripFormDialog(context, ref, existingTrip: trip);
+                      break;
+                    case 'status_upcoming':
+                      _updateTripStatus(context, ref, trip, 'upcoming');
+                      break;
+                    case 'status_ongoing':
+                      _updateTripStatus(context, ref, trip, 'ongoing');
+                      break;
+                    case 'status_completed':
+                      _updateTripStatus(context, ref, trip, 'completed');
+                      break;
+                    case 'delete':
+                      _confirmDeleteTrip(context, ref, trip);
+                      break;
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem<String>(
+                    value: 'edit',
+                    child: Text('Edit Trip'),
+                  ),
+                  PopupMenuDivider(),
+                  PopupMenuItem<String>(
+                    value: 'status_upcoming',
+                    child: Text('Set as Upcoming'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'status_ongoing',
+                    child: Text('Set as Ongoing'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'status_completed',
+                    child: Text('Set as Completed'),
+                  ),
+                  PopupMenuDivider(),
+                  PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Text('Delete Trip'),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -406,9 +478,384 @@ class MyTripsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _openTripFormDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    TripModel? existingTrip,
+  }) async {
+    final isEdit = existingTrip != null;
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(
+      text: existingTrip?.name ?? '',
+    );
+    final locationController = TextEditingController(
+      text: existingTrip?.location ?? '',
+    );
+    final notesController = TextEditingController(
+      text: existingTrip?.notes ?? '',
+    );
+    final latitudeController = TextEditingController(
+      text: existingTrip?.latitude?.toString() ?? '',
+    );
+    final longitudeController = TextEditingController(
+      text: existingTrip?.longitude?.toString() ?? '',
+    );
+
+    final categories = ref.read(categoriesProvider);
+    String selectedCategory = existingTrip?.category ?? categories.first;
+    DateTime? selectedStartDate = existingTrip?.startDate;
+    DateTime? selectedEndDate = existingTrip?.endDate;
+
+    final dateFormat = DateFormat('MMM dd, yyyy');
+
+    final submitted = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            return AlertDialog(
+              title: Text(isEdit ? 'Edit Trip' : 'Add Trip'),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Trip Name',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Trip name is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: locationController,
+                        decoration: const InputDecoration(
+                          labelText: 'Location',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Location is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedCategory,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                        ),
+                        items: categories
+                            .map(
+                              (category) => DropdownMenuItem(
+                                value: category,
+                                child: Text(category),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() {
+                              selectedCategory = value;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: notesController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(labelText: 'Notes'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: latitudeController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Latitude (opsional)',
+                        ),
+                        validator: (value) {
+                          final text = value?.trim() ?? '';
+                          if (text.isEmpty) return null;
+                          final parsed = double.tryParse(text);
+                          if (parsed == null || parsed < -90 || parsed > 90) {
+                            return 'Latitude harus antara -90 hingga 90';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: longitudeController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Longitude (opsional)',
+                        ),
+                        validator: (value) {
+                          final text = value?.trim() ?? '';
+                          if (text.isEmpty) return null;
+                          final parsed = double.tryParse(text);
+                          if (parsed == null || parsed < -180 || parsed > 180) {
+                            return 'Longitude harus antara -180 hingga 180';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Start Date'),
+                        subtitle: Text(
+                          selectedStartDate != null
+                              ? dateFormat.format(selectedStartDate!)
+                              : 'Not set',
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () async {
+                            final pickedDate = await showDatePicker(
+                              context: dialogContext,
+                              initialDate: selectedStartDate ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setDialogState(() {
+                                selectedStartDate = pickedDate;
+                                if (selectedEndDate != null &&
+                                    selectedEndDate!.isBefore(pickedDate)) {
+                                  selectedEndDate = pickedDate;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('End Date'),
+                        subtitle: Text(
+                          selectedEndDate != null
+                              ? dateFormat.format(selectedEndDate!)
+                              : 'Not set',
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () async {
+                            final initialDate =
+                                selectedEndDate ??
+                                selectedStartDate ??
+                                DateTime.now();
+                            final firstDate =
+                                selectedStartDate ?? DateTime(2000);
+                            final pickedDate = await showDatePicker(
+                              context: dialogContext,
+                              initialDate: initialDate,
+                              firstDate: firstDate,
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setDialogState(() {
+                                selectedEndDate = pickedDate;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (formKey.currentState?.validate() != true) {
+                      return;
+                    }
+
+                    final trip = TripModel(
+                      id: existingTrip?.id,
+                      name: nameController.text.trim(),
+                      location: locationController.text.trim(),
+                      notes: notesController.text.trim(),
+                      category: selectedCategory,
+                      userId: existingTrip?.userId ?? '',
+                      startDate: selectedStartDate,
+                      endDate: selectedEndDate,
+                      imagePath: existingTrip?.imagePath,
+                      status: existingTrip?.status ?? 'upcoming',
+                      createdAt: existingTrip?.createdAt,
+                      latitude: latitudeController.text.trim().isEmpty
+                          ? null
+                          : double.tryParse(latitudeController.text.trim()),
+                      longitude: longitudeController.text.trim().isEmpty
+                          ? null
+                          : double.tryParse(longitudeController.text.trim()),
+                    );
+
+                    if (isEdit && existingTrip.id != null) {
+                      await _runTripAction(
+                        context,
+                        ref,
+                        action: () => ref
+                            .read(tripNotifierProvider.notifier)
+                            .updateTrip(existingTrip.id!, trip),
+                        successMessage: 'Trip updated',
+                      );
+                    } else {
+                      await _runTripAction(
+                        context,
+                        ref,
+                        action: () => ref
+                            .read(tripNotifierProvider.notifier)
+                            .addTrip(trip),
+                        successMessage: 'Trip added',
+                      );
+                    }
+
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext, true);
+                    }
+                  },
+                  child: Text(isEdit ? 'Update' : 'Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    nameController.dispose();
+    locationController.dispose();
+    notesController.dispose();
+    latitudeController.dispose();
+    longitudeController.dispose();
+
+    if (submitted == true && context.mounted) {
+      FocusScope.of(context).unfocus();
+    }
+  }
+
+  Future<void> _confirmDeleteTrip(
+    BuildContext context,
+    WidgetRef ref,
+    TripModel trip,
+  ) async {
+    if (trip.id == null) {
+      _showSnackBar(context, 'Trip tidak valid untuk dihapus');
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Trip'),
+          content: Text('Hapus trip "${trip.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    await _runTripAction(
+      context,
+      ref,
+      action: () =>
+          ref.read(tripNotifierProvider.notifier).deleteTrip(trip.id!),
+      successMessage: 'Trip deleted',
+    );
+  }
+
+  Future<void> _updateTripStatus(
+    BuildContext context,
+    WidgetRef ref,
+    TripModel trip,
+    String status,
+  ) async {
+    if (trip.id == null) {
+      _showSnackBar(context, 'Trip tidak valid untuk diupdate');
+      return;
+    }
+
+    await _runTripAction(
+      context,
+      ref,
+      action: () => ref
+          .read(tripNotifierProvider.notifier)
+          .updateTripStatus(trip.id!, status),
+      successMessage: 'Status trip diperbarui',
+    );
+  }
+
+  Future<void> _runTripAction(
+    BuildContext context,
+    WidgetRef ref, {
+    required Future<void> Function() action,
+    required String successMessage,
+  }) async {
+    await action();
+    final actionState = ref.read(tripNotifierProvider);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    if (actionState.hasError) {
+      _showSnackBar(
+        context,
+        'Gagal menyimpan ke Firestore: ${actionState.error}',
+      );
+      return;
+    }
+
+    _showSnackBar(context, successMessage);
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Widget _buildActivityCard(BuildContext context, ActivityModel activity) {
     final dateFormat = DateFormat('MMM dd, yyyy');
-    final status = _activityStatusString(activity);
+    final activityStatus = getActivityStatus(activity, DateTime.now());
+    final status = switch (activityStatus) {
+      ActivityStatus.upcoming => 'upcoming',
+      ActivityStatus.ongoing => 'ongoing',
+      ActivityStatus.completed => 'completed',
+    };
     Color statusColor;
     IconData statusIcon;
 
@@ -525,14 +972,20 @@ class MyTripsScreen extends ConsumerWidget {
                             color: Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            dateFormat.format(activity.date!),
-                            style: Theme.of(context).textTheme.bodySmall,
+                          Expanded(
+                            child: Text(
+                              dateFormat.format(activity.date!),
+                              style: Theme.of(context).textTheme.bodySmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
                     const SizedBox(height: 8),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -559,7 +1012,6 @@ class MyTripsScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -588,84 +1040,6 @@ class MyTripsScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _activityStatusString(ActivityModel activity) {
-    final status = getActivityStatus(activity, DateTime.now());
-    switch (status) {
-      case ActivityStatus.upcoming:
-        return 'upcoming';
-      case ActivityStatus.ongoing:
-        return 'ongoing';
-      case ActivityStatus.completed:
-        return 'completed';
-    }
-  }
-
-  Map<String, int> _buildActivityStats(List<ActivityModel> activities) {
-    int upcoming = 0;
-    int ongoing = 0;
-    int completed = 0;
-
-    for (final activity in activities) {
-      switch (_activityStatusString(activity)) {
-        case 'upcoming':
-          upcoming++;
-          break;
-        case 'ongoing':
-          ongoing++;
-          break;
-        case 'completed':
-          completed++;
-          break;
-      }
-    }
-
-    return {
-      'total': activities.length,
-      'upcoming': upcoming,
-      'ongoing': ongoing,
-      'completed': completed,
-    };
-  }
-
-  List<ActivityModel> _filterAndSortActivities(
-    List<ActivityModel> activities,
-    TripFilterStatus filterStatus,
-    TripSortBy sortBy,
-  ) {
-    var filtered = activities.where((activity) {
-      final status = _activityStatusString(activity);
-      switch (filterStatus) {
-        case TripFilterStatus.upcoming:
-          return status == 'upcoming';
-        case TripFilterStatus.ongoing:
-          return status == 'ongoing';
-        case TripFilterStatus.completed:
-          return status == 'completed';
-        case TripFilterStatus.all:
-          return true;
-      }
-    }).toList();
-
-    filtered.sort((a, b) {
-      switch (sortBy) {
-        case TripSortBy.dateAsc:
-          final aDate = a.date ?? DateTime(9999);
-          final bDate = b.date ?? DateTime(9999);
-          return aDate.compareTo(bDate);
-        case TripSortBy.dateDesc:
-          final aDate = a.date ?? DateTime(0);
-          final bDate = b.date ?? DateTime(0);
-          return bDate.compareTo(aDate);
-        case TripSortBy.nameAsc:
-          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
-        case TripSortBy.nameDesc:
-          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
-      }
-    });
-
-    return filtered;
   }
 
   String _getFilterLabel(TripFilterStatus status) {

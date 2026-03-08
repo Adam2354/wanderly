@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../data/models/activity_model.dart';
-import '../../data/providers/activity_provider.dart';
-import '../trips/activity_detail_screen.dart';
+import '../../presentation/providers/activity_provider.dart';
+import 'activity_map_screen.dart';
+import '../../presentation/screens/trips/activity_detail_screen.dart';
 
 class MyItineraryScreen extends ConsumerStatefulWidget {
   final String? initialCategory;
@@ -96,6 +98,12 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
       text: existing?.location ?? '',
     );
     final notesController = TextEditingController(text: existing?.notes ?? '');
+    final latitudeController = TextEditingController(
+      text: existing?.latitude?.toString() ?? '',
+    );
+    final longitudeController = TextEditingController(
+      text: existing?.longitude?.toString() ?? '',
+    );
     DateTime? selectedDate = existing?.date;
     String? selectedImagePath = existing?.imagePath;
     final imagePicker = ImagePicker();
@@ -228,6 +236,50 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                         maxLines: 2,
                       ),
                       const SizedBox(height: 10),
+                      TextField(
+                        controller: latitudeController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                          labelText: 'Latitude (opsional)',
+                          labelStyle: TextStyle(color: subTextColor),
+                          filled: true,
+                          fillColor: inputFill,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: longitudeController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        style: TextStyle(color: textColor),
+                        decoration: InputDecoration(
+                          labelText: 'Longitude (opsional)',
+                          labelStyle: TextStyle(color: subTextColor),
+                          filled: true,
+                          fillColor: inputFill,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       InkWell(
                         onTap: () async {
                           final picked = await showDatePicker(
@@ -350,6 +402,12 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
 
                               final location = locationController.text.trim();
                               final notes = notesController.text.trim();
+                              final latitude = double.tryParse(
+                                latitudeController.text.trim(),
+                              );
+                              final longitude = double.tryParse(
+                                longitudeController.text.trim(),
+                              );
 
                               final activity = ActivityModel(
                                 name: name,
@@ -359,6 +417,8 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                                 imagePath:
                                     selectedImagePath ?? existing?.imagePath,
                                 category: selectedCategory,
+                                latitude: latitude,
+                                longitude: longitude,
                               );
 
                               if (existing != null) {
@@ -417,6 +477,66 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openInGoogleMaps(ActivityModel item) async {
+    final hasCoordinate = item.latitude != null && item.longitude != null;
+    final fallbackQuery = [
+      item.name.trim(),
+      item.location.trim(),
+    ].where((part) => part.isNotEmpty).join(', ');
+    final query = hasCoordinate
+        ? '${item.latitude},${item.longitude}'
+        : fallbackQuery;
+
+    if (query.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lokasi wisata belum tersedia.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(query)}',
+    );
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal membuka Google Maps.')),
+      );
+    }
+  }
+
+  Future<void> _openNavigationInGoogleMaps(ActivityModel item) async {
+    final hasCoordinate = item.latitude != null && item.longitude != null;
+    final fallbackDestination = [
+      item.name.trim(),
+      item.location.trim(),
+    ].where((part) => part.isNotEmpty).join(', ');
+    final destination = hasCoordinate
+        ? '${item.latitude},${item.longitude}'
+        : fallbackDestination;
+
+    if (destination.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lokasi wisata belum tersedia.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=${Uri.encodeComponent(destination)}&travelmode=driving',
+    );
+
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal membuka navigasi Google Maps.')),
+      );
+    }
   }
 
   @override
@@ -540,6 +660,44 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                             color: textColor,
                           ),
                           overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ActivityMapScreen(activities: activities),
+                              ),
+                            );
+                          },
+                          tooltip: 'Peta Wisata',
+                          icon: Icon(
+                            Icons.map_outlined,
+                            size: 22,
+                            color: textColor,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 44,
+                            minHeight: 44,
+                          ),
                         ),
                       ),
                     ],
@@ -908,6 +1066,76 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                                                       ),
                                                     ),
                                                   ),
+                                                  const SizedBox(width: 6),
+                                                  Tooltip(
+                                                    message:
+                                                        'Lihat lokasi di Google Maps',
+                                                    child: InkWell(
+                                                      onTap: () =>
+                                                          _openInGoogleMaps(
+                                                            item,
+                                                          ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            16,
+                                                          ),
+                                                      child: Container(
+                                                        width: 30,
+                                                        height: 30,
+                                                        decoration: BoxDecoration(
+                                                          color: const Color(
+                                                            0xFF2F4BB9,
+                                                          ).withOpacity(0.12),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                16,
+                                                              ),
+                                                        ),
+                                                        child: const Icon(
+                                                          Icons.map_outlined,
+                                                          size: 16,
+                                                          color: Color(
+                                                            0xFF2F4BB9,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Tooltip(
+                                                    message:
+                                                        'Navigasi ke lokasi',
+                                                    child: InkWell(
+                                                      onTap: () =>
+                                                          _openNavigationInGoogleMaps(
+                                                            item,
+                                                          ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            16,
+                                                          ),
+                                                      child: Container(
+                                                        width: 30,
+                                                        height: 30,
+                                                        decoration: BoxDecoration(
+                                                          color: const Color(
+                                                            0xFF10B981,
+                                                          ).withOpacity(0.14),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                16,
+                                                              ),
+                                                        ),
+                                                        child: const Icon(
+                                                          Icons.directions,
+                                                          size: 16,
+                                                          color: Color(
+                                                            0xFF10B981,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             if (item.location.isNotEmpty)
@@ -1048,12 +1276,13 @@ class _MyItineraryScreenState extends ConsumerState<MyItineraryScreen> {
                   padding: const EdgeInsets.all(20),
                   child: SizedBox(
                     width: double.infinity,
-                    height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () => _showActivityForm(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2F4BB9),
                         foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 52),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

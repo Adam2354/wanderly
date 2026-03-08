@@ -16,6 +16,10 @@ class ActivityModel {
 
   late String category;
 
+  late double? latitude;
+
+  late double? longitude;
+
   ActivityModel({
     this.id,
     this.userId = '',
@@ -25,6 +29,8 @@ class ActivityModel {
     required this.category,
     this.date,
     this.imagePath,
+    this.latitude,
+    this.longitude,
   });
 
   ActivityModel.empty()
@@ -35,7 +41,9 @@ class ActivityModel {
       notes = '',
       category = '',
       date = null,
-      imagePath = null;
+      imagePath = null,
+      latitude = null,
+      longitude = null;
 
   factory ActivityModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -48,6 +56,8 @@ class ActivityModel {
       category: data['category'] ?? '',
       date: data['date'] != null ? (data['date'] as Timestamp).toDate() : null,
       imagePath: data['imagePath'],
+      latitude: (data['latitude'] as num?)?.toDouble(),
+      longitude: (data['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -60,6 +70,8 @@ class ActivityModel {
       'category': category,
       'date': date != null ? Timestamp.fromDate(date!) : null,
       'imagePath': imagePath,
+      'latitude': latitude,
+      'longitude': longitude,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -73,6 +85,8 @@ class ActivityModel {
       'category': category,
       'date': date != null ? Timestamp.fromDate(date!) : null,
       'imagePath': imagePath,
+      'latitude': latitude,
+      'longitude': longitude,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -86,6 +100,8 @@ class ActivityModel {
     DateTime? date,
     String? imagePath,
     String? category,
+    double? latitude,
+    double? longitude,
   }) {
     return ActivityModel(
       id: id ?? this.id,
@@ -96,6 +112,8 @@ class ActivityModel {
       date: date ?? this.date,
       imagePath: imagePath ?? this.imagePath,
       category: category ?? this.category,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 }

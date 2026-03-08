@@ -1,42 +1,45 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/firebase_auth_service.dart';
 
-// Provider untuk Firebase Auth Service
-final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
-  return FirebaseAuthService();
-});
+import '../../data/services/activity_firestore_service.dart';
+import '../../data/services/firebase_auth_service.dart';
+import '../../data/services/firestore_service.dart';
+import 'service_providers.dart';
 
-// Provider untuk auth state changes
 final authStateProvider = StreamProvider<User?>((ref) {
   final authService = ref.watch(firebaseAuthServiceProvider);
   return authService.authStateChanges;
 });
 
-// Provider untuk current user
 final currentUserProvider = Provider<User?>((ref) {
   final authService = ref.watch(firebaseAuthServiceProvider);
   return authService.currentUser;
 });
 
-// Provider untuk loading state
 final authLoadingProvider = StateProvider<bool>((ref) => false);
 
-// Provider untuk error message
 final authErrorProvider = StateProvider<String?>((ref) => null);
 
-// Auth notifier untuk handle login/register/logout
 class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   final FirebaseAuthService _authService;
+  final FirestoreService _firestoreService;
+  final ActivityFirestoreService _activityFirestoreService;
   final Ref _ref;
 
-  AuthNotifier(this._authService, this._ref)
-    : super(const AsyncValue.loading()) {
-    // Initialize with current user
+  AuthNotifier(
+    this._authService,
+    this._firestoreService,
+    this._activityFirestoreService,
+    this._ref,
+  ) : super(const AsyncValue.loading()) {
     state = AsyncValue.data(_authService.currentUser);
   }
 
-  // Sign in
+  Future<void> _seedUserData(String userId) async {
+    await _firestoreService.seedSampleTripsIfEmpty(userId);
+    await _activityFirestoreService.seedSampleActivitiesIfEmpty(userId);
+  }
+
   Future<void> signIn(String email, String password) async {
     state = const AsyncValue.loading();
     _ref.read(authLoadingProvider.notifier).state = true;
@@ -47,6 +50,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
         email: email,
         password: password,
       );
+      final uid = userCredential.user?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        await _seedUserData(uid);
+      }
       state = AsyncValue.data(userCredential.user);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
@@ -56,7 +63,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
-  // Register
   Future<void> register(
     String email,
     String password, {
@@ -71,6 +77,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
         email: email,
         password: password,
       );
+      final uid = userCredential.user?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        await _seedUserData(uid);
+      }
       if (displayName != null && displayName.trim().isNotEmpty) {
         await userCredential.user?.updateDisplayName(displayName.trim());
         await userCredential.user?.reload();
@@ -84,7 +94,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
-  // Sign out
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     _ref.read(authLoadingProvider.notifier).state = true;
@@ -100,15 +109,22 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
-  // Check if logged in
   bool isLoggedIn() {
     return _authService.isLoggedIn();
   }
 }
 
-// Auth notifier provider
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<User?>>((ref) {
       final authService = ref.watch(firebaseAuthServiceProvider);
-      return AuthNotifier(authService, ref);
+      final firestoreService = ref.watch(firestoreServiceProvider);
+      final activityFirestoreService = ref.watch(
+        activityFirestoreServiceProvider,
+      );
+      return AuthNotifier(
+        authService,
+        firestoreService,
+        activityFirestoreService,
+        ref,
+      );
     });

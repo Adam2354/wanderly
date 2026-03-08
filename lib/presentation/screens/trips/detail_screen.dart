@@ -1,12 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DetailScreen extends StatelessWidget {
+import '../../../data/models/activity_model.dart';
+import '../../providers/location_provider.dart';
+
+class DetailScreen extends ConsumerWidget {
   final String? name;
+  final ActivityModel? activity;
 
-  const DetailScreen({super.key, this.name});
+  const DetailScreen({super.key, this.name, this.activity});
+
+  Future<void> _launchGoogleMaps(BuildContext context, String mapsUri) async {
+    if (mapsUri.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lokasi wisata belum tersedia.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse(mapsUri);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal membuka Google Maps.')),
+      );
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ??
@@ -15,6 +38,26 @@ class DetailScreen extends StatelessWidget {
         Theme.of(context).textTheme.bodySmall?.color ??
         (isDark ? Colors.white70 : Colors.black54);
     final cardColor = Theme.of(context).cardColor;
+    final destinationName = activity?.name.trim().isNotEmpty == true
+        ? activity!.name.trim()
+        : (name?.trim().isNotEmpty == true ? name!.trim() : 'Golden Pavillion');
+    final destinationCategory = activity?.category.trim().isNotEmpty == true
+        ? activity!.category.trim()
+        : 'Hotel';
+    final destinationLocation = activity?.location.trim().isNotEmpty == true
+        ? activity!.location.trim()
+        : 'Kyoto, Japan';
+    final destinationImage = activity?.imagePath?.trim().isNotEmpty == true
+        ? activity!.imagePath!.trim()
+        : 'assets/images/Golden Pavillion.png';
+    final destinationNotes = activity?.notes.trim().isNotEmpty == true
+        ? activity!.notes.trim()
+        : '';
+    final detailDescription = destinationNotes.length >= 140
+        ? destinationNotes
+        : destinationNotes.isNotEmpty
+        ? '$destinationNotes\n\nNikmati pengalaman $destinationCategory di $destinationLocation dengan ritme perjalanan yang santai namun tetap terarah. Luangkan waktu untuk mengeksplorasi area sekitar, menemukan spot foto terbaik, serta mencoba rekomendasi kuliner lokal agar kunjungan terasa lebih lengkap.\n\nUntuk hasil kunjungan yang optimal, pertimbangkan datang di jam yang lebih sepi, siapkan rencana rute antar destinasi, dan sisakan waktu untuk beristirahat sejenak. Dengan begitu, perjalanan ke $destinationName akan terasa lebih nyaman, berkesan, dan mudah dinikmati dari awal sampai akhir.'
+        : 'Embark on a tranquil journey to one of Kyoto\'s iconic destinations. Explore the unique cultural atmosphere, enjoy the surrounding scenery, and plan your visit with enough time to experience each spot comfortably.\n\nNikmati pengalaman $destinationCategory di $destinationLocation dengan ritme perjalanan yang santai namun tetap terarah. Luangkan waktu untuk mengeksplorasi area sekitar, menemukan spot foto terbaik, serta mencoba rekomendasi kuliner lokal agar kunjungan terasa lebih lengkap.\n\nUntuk hasil kunjungan yang optimal, pertimbangkan datang di jam yang lebih sepi, siapkan rencana rute antar destinasi, dan sisakan waktu untuk beristirahat sejenak. Dengan begitu, perjalanan ke $destinationName akan terasa lebih nyaman, berkesan, dan mudah dinikmati dari awal sampai akhir.';
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -27,28 +70,40 @@ class DetailScreen extends StatelessWidget {
                 Stack(
                   children: [
                     Image.asset(
-                      'assets/images/Golden Pavillion.png',
+                      destinationImage,
                       width: double.infinity,
                       height: 380,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: 380,
+                          color: Colors.grey[300],
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.image, size: 64),
+                        );
+                      },
                     ),
                     Positioned(
                       bottom: 16,
                       left: 16,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            'Golden Pavillion',
-                            style: TextStyle(
+                            destinationName,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'Hotel',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            destinationCategory,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
                           ),
                         ],
                       ),
@@ -72,7 +127,7 @@ class DetailScreen extends StatelessWidget {
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                'Kyoto, Japan',
+                                destinationLocation,
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -153,6 +208,43 @@ class DetailScreen extends StatelessWidget {
                   ),
                 ),
 
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final mapsUri = await ref.read(
+                          googleMapsUriProvider((
+                            destinationName: destinationName,
+                            location: destinationLocation,
+                            activity: activity,
+                          )).future,
+                        );
+                        if (context.mounted) {
+                          await _launchGoogleMaps(context, mapsUri);
+                        }
+                      },
+                      icon: const Icon(Icons.map_outlined, size: 18),
+                      label: const Text(
+                        'Lihat di google Maps',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2F4BB9),
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Detail Section
                 Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -169,7 +261,7 @@ class DetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Embark on a tranquil journey to Japan\'s iconic Kinkaku-ji Temple, also known as the Golden Pavilion. Set against the serene backdrop of Kyoto\'s lush gardens and calm ponds, this Zen Buddhist temple radiates golden beauty and deep historical and spiritual significance. Wander along peaceful pathways while admiring the harmonious blend of nature and architecture, intricate details, and the temple\'s timeless cultural charm.',
+                        detailDescription,
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.6,
@@ -203,7 +295,7 @@ class DetailScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          // 💎 Detail section ini sangat komplet. Penggunaan `SingleChildScrollView` 
+                          // 💎 Detail section ini sangat komplet. Penggunaan `SingleChildScrollView`
                           // memastikan konten aman di layar yang lebih kecil. Rapi! 📱✨
                           ElevatedButton(
                             onPressed: () {
@@ -234,7 +326,7 @@ class DetailScreen extends StatelessWidget {
 
                       // Hotel nearest section
                       Text(
-                        'Hotel nearest Golden Pavillion',
+                        'Hotel nearest $destinationName',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -414,70 +506,64 @@ class DetailScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
 
-                      // Footer
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: cardColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDark
-                                  ? Colors.black.withOpacity(0.4)
-                                  : Colors.black.withOpacity(0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                              spreadRadius: 0,
-                            ),
-                          ],
+                // Footer (full width, no outer margin)
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withOpacity(0.4)
+                            : Colors.black.withOpacity(0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                        spreadRadius: 0,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 20,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo_wanderly.png',
+                        height: 50,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Enjoy your trip with glorious serve from harisenin.com!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 24,
-                          horizontal: 20,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/images/logo_wanderly.png',
-                              height: 50,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Enjoy your trip with glorious serve from harisenin.com!',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: textColor,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor\nTengah, Kota Bogor, Jawa Barat, 16167, Indonesia',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: subTextColor,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '+62-891827-23293',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: subTextColor,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Image.asset('assets/images/Sosmed.png', height: 32),
-                            const SizedBox(height: 12),
-                            Text(
-                              '©2026 Khoiri Rizki Bani Adam, All Rights Reserved',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: subTextColor.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Jl. Raya Pajajaran No.88, Kel. Tanah Sareal, Kec. Bogor\nTengah, Kota Bogor, Jawa Barat, 16167, Indonesia',
+                        style: TextStyle(fontSize: 11, color: subTextColor),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '+62-891827-23293',
+                        style: TextStyle(fontSize: 11, color: subTextColor),
+                      ),
+                      const SizedBox(height: 12),
+                      Image.asset('assets/images/Sosmed.png', height: 32),
+                      const SizedBox(height: 12),
+                      Text(
+                        '©2026 Khoiri Rizki Bani Adam, All Rights Reserved',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: subTextColor.withOpacity(0.7),
                         ),
                       ),
                     ],

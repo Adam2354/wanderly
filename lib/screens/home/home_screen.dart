@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/activity_model.dart';
-import '../../data/providers/activity_provider.dart';
-import '../trips/kyoto_trip_screen.dart';
+import '../../presentation/providers/activity_provider.dart';
+import '../../presentation/screens/trips/kyoto_trip_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -447,20 +447,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               horizontal: 14,
                               vertical: 10,
                             ),
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark
-                                    ? Colors.black.withOpacity(0.4)
-                                    : Colors.black.withOpacity(0.06),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                                spreadRadius: 0,
-                              ),
-                            ],
-                          ),
+                            decoration: BoxDecoration(
+                              color: cardColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isDark
+                                      ? Colors.black.withOpacity(0.4)
+                                      : Colors.black.withOpacity(0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                  spreadRadius: 0,
+                                ),
+                              ],
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [

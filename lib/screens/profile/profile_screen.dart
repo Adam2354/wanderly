@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/theme_provider.dart';
-import '../../data/providers/auth_provider.dart';
-import '../../data/providers/trip_provider.dart';
-import '../../data/providers/activity_provider.dart';
-import '../trips/my_trips_screen.dart';
+import '../../presentation/providers/theme_provider.dart';
+import '../../presentation/providers/auth_provider.dart';
+import '../../presentation/providers/trip_provider.dart';
+import '../../presentation/providers/activity_provider.dart';
+import '../../presentation/screens/trips/my_trips_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
