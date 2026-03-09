@@ -1,19 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/services/activity_firestore_service.dart';
-import '../../data/services/firebase_auth_service.dart';
-import '../../data/services/firestore_service.dart';
+import '../../data/datasources/firebase/activity_firestore_datasource.dart';
+import '../../data/datasources/firebase/firebase_auth_datasource.dart';
+import '../../data/datasources/firebase/firestore_datasource.dart';
 
-final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
-  return FirebaseAuthService();
+final firebaseAuthDatasourceProvider = Provider<FirebaseAuthDatasource>((ref) {
+  return FirebaseAuthDatasource();
 });
 
-final firestoreServiceProvider = Provider<FirestoreService>((ref) {
-  return FirestoreService();
+final firestoreDatasourceProvider = Provider<FirestoreDatasource>((ref) {
+  return FirestoreDatasource();
 });
 
-final activityFirestoreServiceProvider = Provider<ActivityFirestoreService>((
-  ref,
-) {
-  return ActivityFirestoreService();
-});
+final activityFirestoreDatasourceProvider =
+    Provider<ActivityFirestoreDatasource>((ref) {
+      return ActivityFirestoreDatasource();
+    });

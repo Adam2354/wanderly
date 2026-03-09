@@ -1,15 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/trip_model.dart';
 
-class FirestoreService {
+import '../../models/trip_model.dart';
+
+class FirestoreDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String collectionName = 'trips';
 
-  // Get trips collection reference
   CollectionReference get _tripsCollection =>
       _firestore.collection(collectionName);
 
-  // Stream of trips for specific user
   Stream<List<TripModel>> getTripsStream(String userId) {
     return _tripsCollection.where('userId', isEqualTo: userId).snapshots().map((
       snapshot,
@@ -22,7 +21,6 @@ class FirestoreService {
     });
   }
 
-  // Get all trips for user (one-time fetch)
   Future<List<TripModel>> getTrips(String userId) async {
     try {
       final querySnapshot = await _tripsCollection
@@ -38,7 +36,6 @@ class FirestoreService {
     }
   }
 
-  // Get single trip by ID
   Future<TripModel?> getTrip(String tripId) async {
     try {
       final doc = await _tripsCollection.doc(tripId).get();
@@ -51,7 +48,6 @@ class FirestoreService {
     }
   }
 
-  // Add new trip
   Future<String> addTrip(TripModel trip) async {
     try {
       final docRef = await _tripsCollection.add(trip.toFirestore());
@@ -61,7 +57,6 @@ class FirestoreService {
     }
   }
 
-  // Update trip
   Future<void> updateTrip(String tripId, TripModel trip) async {
     try {
       await _tripsCollection
@@ -72,7 +67,6 @@ class FirestoreService {
     }
   }
 
-  // Delete trip
   Future<void> deleteTrip(String tripId) async {
     try {
       await _tripsCollection.doc(tripId).delete();
@@ -81,7 +75,6 @@ class FirestoreService {
     }
   }
 
-  // Update trip status
   Future<void> updateTripStatus(String tripId, String status) async {
     try {
       await _tripsCollection.doc(tripId).update({
@@ -93,7 +86,6 @@ class FirestoreService {
     }
   }
 
-  // Get trips by category
   Future<List<TripModel>> getTripsByCategory(
     String userId,
     String category,
@@ -113,7 +105,6 @@ class FirestoreService {
     }
   }
 
-  // Get trips by status
   Future<List<TripModel>> getTripsByStatus(String userId, String status) async {
     try {
       final querySnapshot = await _tripsCollection
@@ -130,7 +121,6 @@ class FirestoreService {
     }
   }
 
-  // Batch delete (for testing/admin)
   Future<void> deleteAllUserTrips(String userId) async {
     try {
       final querySnapshot = await _tripsCollection

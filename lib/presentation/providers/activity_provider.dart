@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/datasources/firebase/activity_firestore_datasource.dart';
+import '../../data/datasources/firebase/firebase_auth_datasource.dart';
 import '../../data/models/activity_model.dart';
-import '../../data/services/activity_firestore_service.dart';
-import '../../data/services/firebase_auth_service.dart';
 import 'service_providers.dart';
 
 final activitiesProvider =
     StateNotifierProvider<ActivitiesNotifier, AsyncValue<List<ActivityModel>>>((
       ref,
     ) {
-      final activityService = ref.watch(activityFirestoreServiceProvider);
-      final authService = ref.watch(firebaseAuthServiceProvider);
+      final activityService = ref.watch(activityFirestoreDatasourceProvider);
+      final authService = ref.watch(firebaseAuthDatasourceProvider);
       return ActivitiesNotifier(activityService, authService);
     });
 
@@ -75,8 +75,8 @@ class ActivitiesNotifier
     _subscribeActivities();
   }
 
-  final ActivityFirestoreService _activityService;
-  final FirebaseAuthService _authService;
+  final ActivityFirestoreDatasource _activityService;
+  final FirebaseAuthDatasource _authService;
   StreamSubscription<List<ActivityModel>>? _activitiesSubscription;
   StreamSubscription<User?>? _authSubscription;
   bool _isSeeding = false;

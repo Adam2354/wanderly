@@ -1,18 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/services/activity_firestore_service.dart';
-import '../../data/services/firebase_auth_service.dart';
-import '../../data/services/firestore_service.dart';
+import '../../data/datasources/firebase/activity_firestore_datasource.dart';
+import '../../data/datasources/firebase/firebase_auth_datasource.dart';
+import '../../data/datasources/firebase/firestore_datasource.dart';
 import 'service_providers.dart';
 
 final authStateProvider = StreamProvider<User?>((ref) {
-  final authService = ref.watch(firebaseAuthServiceProvider);
+  final authService = ref.watch(firebaseAuthDatasourceProvider);
   return authService.authStateChanges;
 });
 
 final currentUserProvider = Provider<User?>((ref) {
-  final authService = ref.watch(firebaseAuthServiceProvider);
+  final authService = ref.watch(firebaseAuthDatasourceProvider);
   return authService.currentUser;
 });
 
@@ -21,9 +21,9 @@ final authLoadingProvider = StateProvider<bool>((ref) => false);
 final authErrorProvider = StateProvider<String?>((ref) => null);
 
 class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
-  final FirebaseAuthService _authService;
-  final FirestoreService _firestoreService;
-  final ActivityFirestoreService _activityFirestoreService;
+  final FirebaseAuthDatasource _authService;
+  final FirestoreDatasource _firestoreService;
+  final ActivityFirestoreDatasource _activityFirestoreService;
   final Ref _ref;
 
   AuthNotifier(
@@ -116,10 +116,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
 
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<User?>>((ref) {
-      final authService = ref.watch(firebaseAuthServiceProvider);
-      final firestoreService = ref.watch(firestoreServiceProvider);
+      final authService = ref.watch(firebaseAuthDatasourceProvider);
+      final firestoreService = ref.watch(firestoreDatasourceProvider);
       final activityFirestoreService = ref.watch(
-        activityFirestoreServiceProvider,
+        activityFirestoreDatasourceProvider,
       );
       return AuthNotifier(
         authService,

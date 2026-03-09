@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../activity_store.dart';
-import '../models/activity_model.dart';
 
-class ActivityFirestoreService {
+import '../activity_store.dart';
+import '../../models/activity_model.dart';
+
+class ActivityFirestoreDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String collectionName = 'activities';
 

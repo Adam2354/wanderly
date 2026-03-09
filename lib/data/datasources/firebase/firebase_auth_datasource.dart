@@ -1,18 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-class FirebaseAuthService {
+class FirebaseAuthDatasource {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Get current user
   User? get currentUser => _auth.currentUser;
 
-  // Get current user ID
   String? get currentUserId => _auth.currentUser?.uid;
 
-  // Auth state changes stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Sign in with email and password
   Future<UserCredential> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -27,7 +23,6 @@ class FirebaseAuthService {
     }
   }
 
-  // Register with email and password
   Future<UserCredential> registerWithEmailAndPassword({
     required String email,
     required String password,
@@ -42,12 +37,10 @@ class FirebaseAuthService {
     }
   }
 
-  // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  // Handle Firebase Auth exceptions
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -69,7 +62,6 @@ class FirebaseAuthService {
     }
   }
 
-  // Check if user is logged in
   bool isLoggedIn() {
     return _auth.currentUser != null;
   }

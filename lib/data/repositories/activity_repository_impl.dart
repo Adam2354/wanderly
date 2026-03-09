@@ -1,13 +1,10 @@
 import '../../domain/activities/repositories/activity_repository.dart';
+import '../datasources/firebase/activity_firestore_datasource.dart';
 import '../models/activity_model.dart';
-import '../services/activity_firestore_service.dart';
 
-/// Implementation of [ActivityRepository] using Firestore as data source
-///
-/// Adapts the [ActivityFirestoreService] to the [ActivityRepository] interface,
-/// providing a clean abstraction layer for activity data operations
+/// Implementation of [ActivityRepository] using Firestore as data source.
 class ActivityRepositoryImpl implements ActivityRepository {
-  final ActivityFirestoreService _activityService;
+  final ActivityFirestoreDatasource _activityService;
 
   ActivityRepositoryImpl(this._activityService);
 

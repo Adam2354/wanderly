@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/mappers/trip_mapper.dart';
 import '../../data/models/activity_model.dart';
 import '../../data/models/trip_model.dart';
-import '../../data/repositories/firebase_trip_repository.dart';
-import '../../data/services/firebase_auth_service.dart';
+import '../../data/datasources/firebase/firebase_auth_datasource.dart';
+import '../../data/repositories/trip_repository_impl.dart';
+import '../../domain/repositories/trip_repository.dart';
 import '../../domain/trips/usecases/query_activity_fallback_usecase.dart';
-import '../../domain/trips/repositories/trip_repository.dart';
 import '../../domain/trips/usecases/build_trip_map_points_usecase.dart';
 import '../../domain/trips/usecases/query_trips_usecase.dart';
 import 'activity_provider.dart';
@@ -20,9 +20,9 @@ final tripMapperProvider = Provider<TripMapper>((ref) {
 });
 
 final tripRepositoryProvider = Provider<TripRepository>((ref) {
-  final firestoreService = ref.watch(firestoreServiceProvider);
+  final firestoreService = ref.watch(firestoreDatasourceProvider);
   final mapper = ref.watch(tripMapperProvider);
-  return FirebaseTripRepository(firestoreService, mapper);
+  return TripRepositoryImpl(firestoreService, mapper);
 });
 
 final queryTripsUseCaseProvider = Provider<QueryTripsUseCase>((ref) {
@@ -51,7 +51,7 @@ final tripSortByProvider = StateProvider<TripSortBy>((ref) {
 final tripsStreamProvider = StreamProvider<List<TripModel>>((ref) {
   final tripRepository = ref.watch(tripRepositoryProvider);
   final mapper = ref.watch(tripMapperProvider);
-  final authService = ref.watch(firebaseAuthServiceProvider);
+  final authService = ref.watch(firebaseAuthDatasourceProvider);
 
   return authService.authStateChanges.asyncExpand((user) async* {
     if (user == null) {
@@ -110,7 +110,7 @@ final allTripMapPointsProvider = Provider<List<TripMapPoint>>((ref) {
 class TripNotifier extends StateNotifier<AsyncValue<void>> {
   final TripRepository _tripRepository;
   final TripMapper _tripMapper;
-  final FirebaseAuthService _authService;
+  final FirebaseAuthDatasource _authService;
 
   TripNotifier(this._tripRepository, this._tripMapper, this._authService)
     : super(const AsyncValue.data(null));
@@ -170,7 +170,7 @@ final tripNotifierProvider =
     StateNotifierProvider<TripNotifier, AsyncValue<void>>((ref) {
       final tripRepository = ref.watch(tripRepositoryProvider);
       final mapper = ref.watch(tripMapperProvider);
-      final authService = ref.watch(firebaseAuthServiceProvider);
+      final authService = ref.watch(firebaseAuthDatasourceProvider);
       return TripNotifier(tripRepository, mapper, authService);
     });
 

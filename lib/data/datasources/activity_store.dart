@@ -1,4 +1,4 @@
-// 💎 Model data `ActivityItem` yang simpel tapi efektif. Penggunaan tipe data `DateTime?` 
+// 💎 Model data `ActivityItem` yang simpel tapi efektif. Penggunaan tipe data `DateTime?`
 // sangat tepat untuk fleksibilitas jadwal kunjungan. 👍
 class ActivityItem {
   ActivityItem({
@@ -16,7 +16,7 @@ class ActivityItem {
   String? imagePath;
 }
 
-// 💎 Implementasi `ActivityStore` sebagai Singleton adalah keputusan arsitektur 
+// 💎 Implementasi `ActivityStore` sebagai Singleton adalah keputusan arsitektur
 // yang cerdas! Ini memastikan konsistensi data di seluruh aplikasi. 🏗️✨
 class ActivityStore {
   ActivityStore._() {
@@ -39,7 +39,6 @@ class ActivityStore {
   };
 
   void _initializeSampleData() {
-    // Sightseeing
     _itemsByCategory['Sightseeing']!.addAll([
       ActivityItem(
         name: 'Golden Pavilion',
@@ -64,7 +63,6 @@ class ActivityStore {
       ),
     ]);
 
-    // Restaurant
     _itemsByCategory['Restaurant']!.addAll([
       ActivityItem(
         name: 'Ichiran Ramen',
@@ -89,7 +87,6 @@ class ActivityStore {
       ),
     ]);
 
-    // Nightlife
     _itemsByCategory['Nightlife']!.addAll([
       ActivityItem(
         name: 'Gion District',
@@ -107,7 +104,6 @@ class ActivityStore {
       ),
     ]);
 
-    // Hotel
     _itemsByCategory['Hotel']!.addAll([
       ActivityItem(
         name: 'Kyoto Granbell Hotel',
@@ -125,7 +121,6 @@ class ActivityStore {
       ),
     ]);
 
-    // Shopping
     _itemsByCategory['Shopping']!.addAll([
       ActivityItem(
         name: 'Nishiki Market',
@@ -150,7 +145,6 @@ class ActivityStore {
       ),
     ]);
 
-    // Cinema
     _itemsByCategory['Cinema']!.addAll([
       ActivityItem(
         name: 'TOHO Cinemas Nijojo',
@@ -196,7 +190,7 @@ class ActivityStore {
     return list.indexOf(item);
   }
 
-  // 💎 Method CRUD (`addItem`, `updateItem`, `deleteItem`) di level store membuat logic 
+  // 💎 Method CRUD (`addItem`, `updateItem`, `deleteItem`) di level store membuat logic
   // UI tetap bersih dan hanya fokus pada penampilan. Good job! 🎯✅
   void addItem(String category, ActivityItem item) {
     _itemsByCategory[category]?.add(item);
