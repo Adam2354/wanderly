@@ -97,4 +97,4 @@ flutter run
 ---
 
 ## 📄 License
-Belum ditentukan. Silakan tambahkan file LICENSE jika diperlukan.
+Harisenin.com
