@@ -1,11 +1,33 @@
-# Wanderly
+# Wanderly — Travel Planner App (Flutter + Firebase)
 
-Wanderly adalah aplikasi perencanaan perjalanan berbasis Flutter dengan Firebase (Auth + Firestore), state management Riverpod, serta penerapan Clean Architecture.
+![Wanderly Banner](./assets/images/banner.png)
 
-## Struktur Proyek (Updated)
+## 🚀 Overview
+Wanderly adalah aplikasi perencanaan perjalanan (trip planner) yang dibuat dengan **Flutter** dan **Firebase**. Aplikasi ini menggunakan **Riverpod** untuk state management dan menerapkan pendekatan **Clean Architecture** untuk memisahkan tanggung jawab antar layer agar codebase lebih mudah dirawat dan dikembangkan.
 
-Struktur layer saat ini sudah dirapikan agar lebih konsisten:
+---
 
+## ✨ Key Features
+- **Authentication (Firebase Auth)**: Register/Login pengguna.
+- **Trip Management**: Membuat dan melihat daftar perjalanan.
+- **Activities**: Menambahkan aktivitas pada rencana perjalanan.
+- **Cloud Data (Firestore)**: Data tersimpan dan tersinkronisasi melalui Firestore.
+- **Maps Integration**: Integrasi **Google Maps** untuk kebutuhan lokasi.
+- **Clean Architecture**: Pemisahan layer **presentation / domain / data**.
+
+---
+
+## 🛠️ Technology Stack
+| Category | Technologies |
+| :--- | :--- |
+| **Framework** | Flutter (Dart) |
+| **State Management** | Riverpod |
+| **Backend / BaaS** | Firebase (Auth, Firestore) |
+| **Maps** | google_maps_flutter |
+
+---
+
+## 📁 Project Structure
 ```text
 lib/
 ├── core/
@@ -23,72 +45,56 @@ lib/
 │   │   └── activity_repository_impl.dart
 ├── domain/
 │   ├── entities/
-│   │   └── trip.dart
 │   ├── repositories/
-│   │   └── trip_repository.dart
 │   ├── usecases/
-│   │   ├── add_trip.dart
-│   │   └── get_trips.dart
 │   ├── activities/
-│   │   └── repositories/
-│   │       └── activity_repository.dart
 │   └── trips/
-│       ├── entities/
-│       │   ├── trip.dart
-│       │   └── trip_entity.dart
-│       ├── repositories/
-│       │   └── trip_repository.dart
-│       └── usecases/
-│           ├── add_trip.dart
-│           ├── get_trips.dart
-│           ├── query_trips_usecase.dart
-│           ├── query_activity_fallback_usecase.dart
-│           ├── build_trip_map_points_usecase.dart
-│           └── resolve_destination_location_usecase.dart
 ├── presentation/
 │   ├── providers/
-│   │   ├── service_providers.dart
-│   │   ├── auth_provider.dart
-│   │   ├── activity_provider.dart
-│   │   ├── trip_provider.dart
-│   │   ├── location_provider.dart
-│   │   └── theme_provider.dart
 │   ├── screens/
 │   └── utils/
-├── screens/
 ├── shared/
 ├── widgets/
 ├── firebase_options.dart
 └── main.dart
 ```
 
-## Aturan Layer yang Dipakai
+---
 
-- `presentation/providers` untuk state management UI (Riverpod).
-- `data/datasources` untuk integrasi sumber data eksternal (Firebase/API/DB).
-- `domain/repositories` berisi kontrak (interface) repository utama.
-- `data/repositories/*_impl.dart` berisi implementasi repository.
-- `domain/usecases` dan `domain/*/usecases` berisi business logic per fitur.
+## ⚙️ Getting Started
+### 1) Clone repository
+```bash
+git clone https://github.com/Adam2354/wanderly.git
+cd wanderly
+```
 
-## Menjalankan Proyek
-
-1. Install dependency:
-
+### 2) Install dependencies
 ```bash
 flutter pub get
 ```
 
-2. Pastikan Firebase sudah dikonfigurasi (`google-services.json` dan `firebase_options.dart`).
+### 3) Setup Firebase
+Pastikan Firebase sudah dikonfigurasi (mis. `google-services.json`, `GoogleService-Info.plist`, dan `firebase_options.dart`).
 
-3. Jalankan aplikasi:
-
+### 4) Run
 ```bash
 flutter run
 ```
 
-## Referensi Dokumen Lain
+---
 
+## 📚 Documentation
 - `SETUP_GUIDE.md`
 - `README_FIREBASE.md`
 - `IMPLEMENTATION_SUMMARY.md`
 - `CHECKLIST.md`
+
+---
+
+## ✉️ Contact
+- GitHub: **@Adam2354**
+
+---
+
+## 📄 License
+Belum ditentukan. Silakan tambahkan file LICENSE jika diperlukan.
